@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Prodemial — Mon activité</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B4A6F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prodemial">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#07263D; --ocean:#0B4A6F; --ocean2:#13678F;
+  --teal:#0E7C86; --teal2:#12A3A8; --aqua:#64C9CE; --foam:#E7F3F7;
+  --bg:#F2F8FB; --card:#fff; --line:#DCEAF0; --line2:#C2DAE4;
+  --muted:#5D7B8A; --ink:#06243A;
+  --hot:#D96A4A; --warm:#D9A24A; --cold:#1F7FA8; --ok:#2E9E7E;
+  --sh:0 1px 2px rgba(7,38,61,.05),0 10px 30px rgba(7,38,61,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:14.5px;line-height:1.5}
+h1,h2,h3,.ff{font-family:'Outfit',system-ui,sans-serif;font-weight:600;letter-spacing:-.015em;margin:0}
+button,input,select,textarea{font-family:inherit;font-size:14.5px;color:var(--ink)}
+button{cursor:pointer;border:0;background:none}
+input,select,textarea{background:#fff;border:1px solid var(--line2);border-radius:11px;padding:10px 13px;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--teal2);box-shadow:0 0 0 3px rgba(18,163,168,.15)}
+textarea{resize:vertical;line-height:1.55}
+label.f{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 5px}
+
+/* ---------- barre de navigation ---------- */
+.nav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo img{height:34px;width:auto;max-width:150px;object-fit:contain;display:block}
+.logo .mk{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--ocean),var(--teal2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px}
+.logo .tx{font-family:'Outfit';font-weight:600;font-size:16px;letter-spacing:-.02em}
+.nav .sp{flex:1}
+.nb{padding:8px 14px;border-radius:999px;font-weight:600;font-size:13.5px;color:var(--muted)}
+.nb:hover{background:var(--foam);color:var(--ocean)}
+.nb.on{background:var(--ocean);color:#fff}
+.nb .d{display:inline-block;min-width:18px;padding:0 5px;margin-left:6px;border-radius:999px;background:rgba(255,255,255,.25);font-size:11px}
+.nb:not(.on) .d{background:var(--foam);color:var(--teal)}
+
+main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
+.view{display:none}.view.on{display:block}
+
+/* ---------- accueil ---------- */
+.hero{
+  border-radius:24px;overflow:hidden;position:relative;color:#fff;
+  background:linear-gradient(130deg,var(--navy) 0%,var(--ocean) 48%,var(--teal) 100%);
+  padding:40px 36px;box-shadow:var(--sh);
+}
+.hero:after{content:'';position:absolute;right:-70px;top:-70px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero:before{content:'';position:absolute;right:60px;bottom:-110px;width:220px;height:220px;border-radius:50%;background:rgba(100,201,206,.14)}
+.hero-in{position:relative;z-index:2}
+.hero .logozone{min-height:76px;display:flex;align-items:center;margin-bottom:18px}
+.hero .logozone img{max-height:76px;max-width:300px;object-fit:contain}
+.hero .ph{display:flex;align-items:center;gap:14px}
+.hero .ph .mk{width:62px;height:62px;border-radius:18px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:27px}
+.hero h1{font-size:30px;color:#fff}
+.hero .sub{color:rgba(255,255,255,.76);font-size:14px;margin-top:4px}
+.hero .dt{font-size:13px;color:rgba(255,255,255,.62);margin-top:22px;text-transform:capitalize}
+.hzone{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:26px}
+.hz{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 16px;cursor:pointer;transition:.15s}
+.hz:hover{background:rgba(255,255,255,.18)}
+.hz .n{font-family:'Outfit';font-size:28px;font-weight:600;line-height:1}
+.hz .l{font-size:12px;color:rgba(255,255,255,.78);margin-top:4px}
+
+.sec{margin-top:28px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.sec-h h2{font-size:19px}
+.sec-h .s{font-size:13px;color:var(--muted)}
+.sec-h .sp{flex:1}
+
+/* ---------- boutons ---------- */
+.btn{background:var(--teal);color:#fff;border-radius:12px;padding:11px 18px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{background:var(--teal2)}
+.btn.sec{background:#fff;color:var(--ocean);border:1px solid var(--line2);font-weight:600}
+.btn.sec:hover{background:var(--foam)}
+.btn.dark{background:var(--ocean)}.btn.dark:hover{background:var(--ocean2)}
+.btn.sm{padding:7px 13px;font-size:13px;border-radius:10px}
+.btn.danger{background:#fff;color:var(--hot);border:1px solid #ecc5b9}
+.btn.danger:hover{background:#fdf0ec}
+
+/* ---------- cartes personnes ---------- */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.tools input[type=text]{flex:1;min-width:200px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}
+.ch{padding:7px 14px;border-radius:999px;border:1px solid var(--line2);background:#fff;font-size:13px;font-weight:600;color:var(--muted)}
+.ch:hover{border-color:var(--teal2);color:var(--ocean)}
+.ch.on{background:var(--ocean);border-color:var(--ocean);color:#fff}
+.ch .n{opacity:.7;font-weight:500;margin-left:4px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--sh);cursor:pointer;transition:.16s;position:relative}
+.pcard:hover{transform:translateY(-2px);border-color:var(--teal2);box-shadow:0 4px 8px rgba(7,38,61,.06),0 16px 36px rgba(7,38,61,.1)}
+.pcard .top{display:flex;gap:12px;align-items:center}
+.av{width:46px;height:46px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit';font-weight:600;font-size:16px}
+.av.CHAUD{background:linear-gradient(135deg,#E07B57,#C9512F)}
+.av.TIEDE{background:linear-gradient(135deg,#E0B05C,#C28A2C)}
+.av.FROID{background:linear-gradient(135deg,#2E8FB5,#13678F)}
+.av.NA{background:linear-gradient(135deg,#9FB9C4,#7B98A6)}
+.pcard .nm{font-family:'Outfit';font-weight:600;font-size:16px;line-height:1.25}
+.pcard .mt{font-size:12.5px;color:var(--muted);margin-top:2px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.bd{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.02em}
+.bd.CHAUD{background:#fbe8e1;color:#a8431f}
+.bd.TIEDE{background:#faf0dc;color:#8a6118}
+.bd.FROID{background:#e2f0f7;color:#115b7d}
+.bd.gr{background:var(--foam);color:var(--teal);font-weight:600}
+.bd.ok{background:#e1f3ec;color:#1d6e56}
+.dots{display:flex;gap:5px;margin-top:13px;align-items:center}
+.dot{width:23px;height:23px;border-radius:8px;border:1.5px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:var(--muted);background:#fff}
+.dot.done{background:var(--teal);border-color:var(--teal);color:#fff}
+.dot.plan{border-color:var(--teal2);color:var(--teal);background:var(--foam)}
+.nxt{margin-top:11px;font-size:12.5px;padding:7px 11px;border-radius:10px;background:var(--foam);color:var(--ocean);font-weight:600}
+.nxt.late{background:#fbe8e1;color:#a8431f}
+.nxt.today{background:#faf0dc;color:#8a6118}
+
+/* ---------- box ajout ---------- */
+.box{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);padding:22px;margin-bottom:18px;display:none}
+.box.on{display:block}
+.box h3{font-size:17px;margin-bottom:4px}
+.box .s{font-size:13px;color:var(--muted);margin-bottom:18px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.fg .wide{grid-column:1/-1}
+
+/* ---------- fiche ---------- */
+.fiche-h{background:linear-gradient(130deg,var(--navy),var(--ocean) 65%,var(--teal));border-radius:22px;padding:26px 28px;color:#fff;box-shadow:var(--sh);position:relative;overflow:hidden}
+.fiche-h:after{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.07)}
+.fiche-h .in{position:relative;z-index:2;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.fiche-h .av{width:62px;height:62px;border-radius:18px;font-size:22px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3)}
+.fiche-h h1{font-size:25px;color:#fff}
+.fiche-h .s{font-size:13.5px;color:rgba(255,255,255,.76);margin-top:3px}
+.fiche-h .sp{flex:1}
+.back{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);color:#fff;border-radius:11px;padding:8px 14px;font-weight:600;font-size:13.5px}
+.back:hover{background:rgba(255,255,255,.24)}
+.cols{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.blk{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--sh);margin-bottom:16px}
+.blk h3{font-size:16px;margin-bottom:3px}
+.blk .s{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+
+/* rendez-vous */
+.rdvs{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+.rdv{border:1.5px solid var(--line2);border-radius:15px;padding:12px;text-align:center;cursor:pointer;transition:.15s;background:#fff}
+.rdv:hover{border-color:var(--teal2);background:var(--foam)}
+.rdv .t{font-family:'Outfit';font-weight:700;font-size:16px;color:var(--ocean)}
+.rdv .d{font-size:12px;color:var(--muted);margin-top:3px}
+.rdv.plan{border-color:var(--teal2);background:var(--foam)}
+.rdv.plan .d{color:var(--teal);font-weight:600}
+.rdv.done{border-color:var(--teal);background:var(--teal);color:#fff}
+.rdv.done .t,.rdv.done .d{color:#fff}
+.rdv.late{border-color:var(--hot);background:#fdf0ec}
+.rdv.late .d{color:#a8431f;font-weight:600}
+.rdv-ed{border:1px solid var(--line2);border-radius:15px;padding:16px;margin-top:12px;background:var(--foam);display:none}
+.rdv-ed.on{display:block}
+.rdv-ed .r{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px;border-radius:10px;border:1px solid var(--line2);background:#fff;font-size:13px;font-weight:600;color:var(--muted);min-width:80px}
+.seg button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* commentaires */
+.jr{border-left:3px solid var(--aqua);padding:4px 0 4px 14px;margin-bottom:14px;position:relative}
+.jr .d{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:capitalize}
+.jr .t{white-space:pre-wrap;margin-top:3px}
+.jr .x{position:absolute;right:0;top:2px;color:var(--muted);font-size:14px;padding:2px 6px;border-radius:6px}
+.jr .x:hover{background:#fdf0ec;color:var(--hot)}
+
+/* messages */
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);margin-bottom:14px;overflow:hidden}
+.mcard .h{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--foam);border-bottom:1px solid var(--line)}
+.mcard .h .t{font-family:'Outfit';font-weight:600;font-size:15.5px;color:var(--ocean);flex:1}
+.mcard .b{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;padding:18px}
+@media(max-width:820px){.mcard .b{grid-template-columns:1fr}}
+.bub{background:var(--foam);border:1px solid var(--line);border-radius:16px 16px 16px 5px;padding:13px 15px;white-space:pre-wrap;font-size:13.5px;line-height:1.55}
+.vch{display:inline-block;font-size:11.5px;font-family:ui-monospace,monospace;border:1px solid var(--line2);background:var(--foam);border-radius:999px;padding:3px 10px;cursor:pointer;color:var(--ocean);margin:4px 4px 0 0}
+.vch:hover{border-color:var(--teal2)}
+.cnt{font-size:12px;color:var(--muted);margin-top:7px}
+
+.empty{padding:50px 24px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line2);border-radius:20px}
+.empty .ic{font-size:34px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin-bottom:9px;flex-wrap:wrap;box-shadow:var(--sh)}
+.row .g{flex:1;min-width:170px}
+.row .nm{font-weight:600}
+.row .s{font-size:12.5px;color:var(--muted)}
+.pill{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 10px;border-radius:999px}
+.pill.late{background:#fbe8e1;color:#a8431f}
+.pill.today{background:#faf0dc;color:#8a6118}
+.pill.soon{background:var(--foam);color:var(--teal)}
+.acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.hint{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:13.5px;opacity:0;transition:.25s;pointer-events:none;z-index:70;box-shadow:0 10px 30px rgba(7,38,61,.3)}
+.toast.on{opacity:1}
+
+/* ---------- barre d'onglets mobile ---------- */
+.tabbar{display:none}
+.install{background:var(--foam);border:1px solid var(--line2);border-radius:16px;padding:16px 18px;margin-top:10px}
+.install h4{font-size:13.5px;margin-bottom:8px}
+.install ol{margin:0;padding-left:20px;font-size:13px;color:var(--muted);line-height:1.7}
+.install .plat{font-weight:700;color:var(--ocean);margin-top:10px}
+
+@media(max-width:760px){
+  .nav-in{padding:10px 14px}
+  .nb-page{display:none}
+  main{padding:16px 14px calc(78px + env(safe-area-inset-bottom,0px))}
+  .hero{padding:26px 20px}
+  .hero h1{font-size:24px}
+  .fiche-h{padding:20px 18px}
+  .fiche-h h1{font-size:21px}
+  .box{padding:16px}
+  .blk{padding:16px}
+
+  .tabbar{
+    display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);
+    padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px));
+  }
+  .tabbar .tb{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:6px 2px;border-radius:12px;font-size:11px;font-weight:600;color:var(--muted);position:relative;
+  }
+  .tabbar .tb .ic{font-size:19px;line-height:1}
+  .tabbar .tb.on{color:var(--ocean);background:var(--foam)}
+  .tabbar .tb .d{position:absolute;top:2px;right:14%;min-width:16px;height:16px;font-size:10px;line-height:16px;padding:0 4px;border-radius:999px;background:var(--hot);color:#fff}
+  .tabbar .tb .d:empty{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <div class="logo" data-go="accueil">
+      <span id="navLogo"><span class="mk">◆</span></span>
+      <span class="tx">Prodemial</span>
+    </div>
+    <div class="sp"></div>
+    <button class="nb nb-page on" data-go="accueil">Accueil</button>
+    <button class="nb nb-page" data-go="investisseurs">Investisseurs <span class="d" id="nInv"></span></button>
+    <button class="nb nb-page" data-go="filleuls">Filleuls <span class="d" id="nFil"></span></button>
+    <button class="nb nb-page" data-go="archive">Archive <span class="d" id="nArc"></span></button>
+    <button class="nb nb-page" data-go="messages">Messages</button>
+    <button class="nb" id="btnSync" title="Synchroniser avec Google Sheets">⟳</button>
+    <button class="nb nb-page" data-go="reglages">⚙</button>
+  </div>
+</nav>
+
+<nav class="tabbar">
+  <button class="nb tb on" data-go="accueil"><span class="ic">⌂</span><span class="lb">Accueil</span></button>
+  <button class="nb tb" data-go="investisseurs"><span class="ic">👤</span><span class="lb">Invest.</span><span class="d" id="nInvTb"></span></button>
+  <button class="nb tb" data-go="filleuls"><span class="ic">🤝</span><span class="lb">Filleuls</span><span class="d" id="nFilTb"></span></button>
+  <button class="nb tb" data-go="messages"><span class="ic">✉</span><span class="lb">Messages</span></button>
+  <button class="nb tb" data-go="reglages"><span class="ic">⚙</span><span class="lb">Réglages</span></button>
+</nav>
+
+<main>
+
+<!-- ============ ACCUEIL ============ -->
+<section class="view on" id="v-accueil">
+  <div class="hero">
+    <div class="hero-in">
+      <div class="logozone" id="heroLogo">
+        <div class="ph"><div class="mk">◆</div><div><div style="font-family:'Outfit';font-size:26px;font-weight:600">Prodemial</div><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Dépose ton logo dans Réglages</div></div></div>
+      </div>
+      <h1 id="heroHello">Bonjour</h1>
+      <div class="sub">Ton activité en un coup d'œil</div>
+      <div class="dt" id="heroDate"></div>
+      <div class="hzone" id="heroStats"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h">
+      <h2>À faire</h2>
+      <span class="s">Rendez-vous et relances à venir</span>
+      <span class="sp"></span>
+    </div>
+    <div id="todo"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><h2>Accès rapide</h2><span class="sp"></span></div>
+    <div class="acts">
+      <button class="btn" data-go="investisseurs">👤 Mes investisseurs</button>
+      <button class="btn dark" data-go="filleuls">🤝 Mes filleuls</button>
+      <button class="btn sec" data-go="messages">✍️ Mes messages</button>
+      <button class="btn sec" id="qAdd">＋ Nouveau contact</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LISTE (investisseurs / filleuls) ============ -->
+<section class="view" id="v-liste">
+  <div class="sec-h">
+    <h2 id="lTitle">Investisseurs</h2>
+    <span class="s" id="lSub"></span>
+    <span class="sp"></span>
+    <button class="btn" id="btnAdd">＋ Ajouter</button>
+  </div>
+
+  <div class="box" id="addBox">
+    <h3 id="addTitle">Nouveau contact</h3>
+    <div class="s">Seul le nom est obligatoire. Tout le reste se complète plus tard depuis la fiche.</div>
+    <div class="fg">
+      <div><label class="f">Prénom</label><input type="text" id="aPrenom"></div>
+      <div><label class="f">Nom</label><input type="text" id="aNom"></div>
+      <div><label class="f">Téléphone</label><input type="text" id="aTel" placeholder="06 12 34 56 78"></div>
+      <div><label class="f">E-mail</label><input type="text" id="aMail" placeholder="prenom@mail.com"></div>
+      <div><label class="f">Relation</label><select id="aEnv"><option value="">— non définie —</option><option value="CHAUD">Chaud</option><option value="TIEDE">Tiède</option><option value="FROID">Froid</option></select></div>
+      <div><label class="f">Géographie</label><select id="aGeo"><option value="">—</option><option value="proche">Proche</option><option value="eloigne">Éloigné</option></select></div>
+      <div><label class="f">Situation</label><select id="aSit"><option value="">—</option><option>celibataire</option><option>marie</option><option>pacs</option><option>union libre</option><option>veuf</option><option>veuve</option></select></div>
+      <div><label class="f">Tranche d'âge</label><select id="aAge"><option value="">—</option><option>18-25</option><option>25-35</option><option>35-50</option><option>50-60</option><option>60-70</option><option>70+</option></select></div>
+      <div><label class="f">Enfants</label><select id="aEnf"><option value="">—</option><option>0</option><option>1-2</option><option>2+</option></select></div>
+      <div><label class="f">Propriétaire</label><select id="aProp"><option value="">—</option><option value="oui">Oui</option><option value="non">Non</option><option value="ne sait pas">Ne sait pas</option></select></div>
+      <div><label class="f">En activité</label><select id="aAct"><option value="">—</option><option value="oui">Oui</option><option value="non">Non</option></select></div>
+      <div class="wide"><label class="f">Commentaire</label><textarea id="aCom" style="min-height:90px" placeholder="Contexte, d'où vient ce contact, ce qui a été dit…"></textarea></div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="aSave">Enregistrer</button>
+      <button class="btn sec" id="aCancel">Annuler</button>
+    </div>
+  </div>
+
+  <div class="tools">
+    <input type="text" id="q" placeholder="🔎 Rechercher un nom, un téléphone, un e-mail…">
+    <select id="sortBy" style="width:auto;min-width:170px">
+      <option value="az">Ordre alphabétique</option>
+      <option value="rdv">Prochain rendez-vous</option>
+      <option value="chaud">Relation (chaud d'abord)</option>
+      <option value="recent">Ajoutés récemment</option>
+    </select>
+    <button class="btn sec" id="btnXls">📊 Excel</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="grid"></div>
+</section>
+
+<!-- ============ FICHE ============ -->
+<section class="view" id="v-fiche">
+  <div class="fiche-h">
+    <div class="in">
+      <div class="av" id="fAv"></div>
+      <div>
+        <h1 id="fName"></h1>
+        <div class="s" id="fSub"></div>
+      </div>
+      <div class="sp"></div>
+      <button class="back" id="fBack">‹ Retour</button>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="blk">
+        <h3>Parcours de rendez-vous</h3>
+        <div class="s">Clique sur une étape pour poser la date, la marquer faite ou l'annuler.</div>
+        <div class="rdvs" id="fRdvs"></div>
+        <div class="rdv-ed" id="fRdvEd">
+          <label class="f" id="edTitle">Rendez-vous</label>
+          <div class="r">
+            <div><label class="f">Date</label><input type="date" id="edDate"></div>
+            <div><label class="f">Heure</label><input type="time" id="edHeure"></div>
+          </div>
+          <div style="margin-top:12px"><label class="f">Statut</label>
+            <div class="seg" id="edSeg">
+              <button data-st="">À planifier</button>
+              <button data-st="plan">Prévu</button>
+              <button data-st="done">Fait</button>
+              <button data-st="annule">Annulé</button>
+            </div>
+          </div>
+          <div style="margin-top:12px"><label class="f">Note du rendez-vous</label><textarea id="edNote" style="min-height:70px"></textarea></div>
+          <div class="acts"><button class="btn sm" id="edSave">Enregistrer</button><button class="btn sm sec" id="edClose">Fermer</button></div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <h3>Commentaires</h3>
+        <div class="s">Chaque note est horodatée. La plus récente apparaît en haut.</div>
+        <textarea id="cmNew" style="min-height:90px" placeholder="Ce qui s'est dit, ce qu'il faut retenir…"></textarea>
+        <div class="acts"><button class="btn sm" id="cmAdd">Ajouter la note</button></div>
+        <div style="margin-top:20px" id="cmList"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="blk">
+        <h3>Envoyer un message</h3>
+        <div class="s">Choisis un modèle, ajuste le texte, puis ouvre ton application.</div>
+        <label class="f">Modèle</label>
+        <select id="msgSel"></select>
+        <div style="margin-top:14px" id="msgSubjW"><label class="f">Objet (e-mail)</label><input type="text" id="msgSubj"></div>
+        <div style="margin-top:14px"><label class="f">Message</label><textarea id="msgBody" style="min-height:140px"></textarea><div class="cnt" id="msgCnt"></div></div>
+        <div class="acts">
+          <button class="btn" id="mSms">💬 SMS</button>
+          <button class="btn sec" id="mWa">WhatsApp</button>
+          <button class="btn sec" id="mMail">✉️ E-mail</button>
+          <button class="btn sec" id="mCopy">📋 Copier</button>
+        </div>
+        <label class="hint" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="mLog" checked style="width:auto;margin-top:3px"> Ajouter une note automatique dans les commentaires</label>
+        <div class="hint" id="msgHint"></div>
+      </div>
+
+      <div class="blk">
+        <h3>Coordonnées et profil</h3>
+        <div class="s">Modifiable à tout moment.</div>
+        <div class="fg" id="fForm"></div>
+        <div class="acts">
+          <button class="btn sm" id="fSave">Enregistrer</button>
+          <button class="btn sm sec" id="fMove">Déplacer</button>
+          <button class="btn sm sec" id="fArchRefus">Archiver — Refus</button>
+          <button class="btn sm sec" id="fArchSuite">Archiver — Sans suite</button>
+          <button class="btn sm" id="fRestore" style="display:none">↩ Restaurer</button>
+          <button class="btn sm danger" id="fDel">Supprimer</button>
+        </div>
+        <div class="hint" id="fSaved"></div>
+        <div class="hint" id="fArchInfo"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MESSAGES ============ -->
+<section class="view" id="v-messages">
+  <div class="sec-h">
+    <h2>Mes messages</h2>
+    <span class="s">Textes préparés à l'avance, réutilisables depuis chaque fiche</span>
+    <span class="sp"></span>
+    <button class="btn" id="btnNewMsg">＋ Nouveau message</button>
+  </div>
+  <div class="tools">
+    <label class="f" style="margin:0 6px 0 0;align-self:center">Aperçu avec</label>
+    <select id="mSample" style="max-width:280px"></select>
+  </div>
+  <div id="msgList"></div>
+</section>
+
+<!-- ============ REGLAGES ============ -->
+<section class="view" id="v-reglages">
+  <div class="sec-h"><h2>Réglages</h2><span class="s">Logo, identité, sauvegardes</span></div>
+
+  <div class="blk">
+    <h3>Installer sur ton téléphone</h3>
+    <div class="s">Un signet plein écran, avec son icône — pas une vraie application, mais ça s'ouvre et se referme comme une.</div>
+    <div class="install">
+      <div class="plat">📱 iPhone (Safari)</div>
+      <ol>
+        <li>Ouvre cette page dans <strong>Safari</strong> (pas Chrome).</li>
+        <li>Appuie sur l'icône de partage <strong>⬆</strong> en bas de l'écran.</li>
+        <li>Choisis <strong>« Sur l'écran d'accueil »</strong>.</li>
+        <li>Valide. L'icône Prodemial apparaît avec les autres applications.</li>
+      </ol>
+      <div class="plat">🤖 Android (Chrome)</div>
+      <ol>
+        <li>Ouvre cette page dans <strong>Chrome</strong>.</li>
+        <li>Appuie sur le menu <strong>⋮</strong> en haut à droite.</li>
+        <li>Choisis <strong>« Ajouter à l'écran d'accueil »</strong> (ou « Installer l'application »).</li>
+        <li>Valide. L'icône Prodemial apparaît avec les autres applications.</li>
+      </ol>
+    </div>
+    <div class="hint">Les données restent propres à chaque appareil — pense à synchroniser (⟳) après avoir travaillé ailleurs.</div>
+  </div>
+
+  <div class="blk">
+    <h3>Logo Prodemial</h3>
+    <div class="s">Dépose ici ton fichier logo officiel (PNG ou JPG, idéalement sous 300 ko). Il s'affichera sur la page d'accueil et dans la barre du haut.</div>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <div id="logoPrev" style="min-width:160px;min-height:70px;border:1px dashed var(--line2);border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--foam);padding:10px"></div>
+      <div class="acts" style="margin:0">
+        <button class="btn sec" id="logoBtn">Choisir une image</button>
+        <button class="btn sec" id="logoDel">Retirer</button>
+      </div>
+    </div>
+    <input type="file" id="logoFile" accept="image/*" style="display:none">
+  </div>
+
+  <div class="blk">
+    <h3>Synchronisation Google Sheets</h3>
+    <div class="s">Colle ici l'adresse du script déployé (elle se termine par <strong>/exec</strong>) et le jeton que tu as choisi dans Code.gs.</div>
+    <div class="fg">
+      <div class="wide"><label class="f">Adresse du script</label><input type="text" id="sUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+      <div><label class="f">Jeton</label><input type="text" id="sTok" placeholder="prodemial2026"></div>
+      <div style="display:flex;align-items:flex-end">
+        <label class="hint" style="display:flex;gap:8px;align-items:center;margin:0">
+          <input type="checkbox" id="sAuto" style="width:auto"> Synchroniser automatiquement toutes les 5 minutes
+        </label>
+      </div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="sSave">Enregistrer</button>
+      <button class="btn sec" id="sTest">Tester la connexion</button>
+      <button class="btn dark" id="sNow">⟳ Synchroniser maintenant</button>
+    </div>
+    <div class="hint" id="sEtat"></div>
+  </div>
+
+  <div class="blk">
+    <h3>Mon identité</h3>
+    <div class="s">Utilisée dans les modèles de messages, via les variables {moi} et {tel}.</div>
+    <div class="fg">
+      <div><label class="f">Prénom affiché</label><input type="text" id="cPrenom"></div>
+      <div><label class="f">Mon téléphone</label><input type="text" id="cTel"></div>
+      <div class="wide"><label class="f">Signature e-mail</label><textarea id="cSig" style="min-height:90px"></textarea></div>
+    </div>
+    <div class="acts"><button class="btn" id="cSave">Enregistrer</button></div>
+  </div>
+
+  <div class="blk">
+    <h3>Sauvegardes</h3>
+    <div class="s">Les données vivent dans ce navigateur. Fais une sauvegarde régulièrement.</div>
+    <div class="acts">
+      <button class="btn sec" id="bExport">⬇ Sauvegarde complète (JSON)</button>
+      <button class="btn sec" id="bImportBtn">⬆ Restaurer une sauvegarde</button>
+      <button class="btn sec" id="bXls">📊 Export Excel</button>
+      <input type="file" id="bImport" accept="application/json" style="display:none">
+    </div>
+    <div class="hint" id="stStats"></div>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script id="seed" type="text/plain">nom,prenom,contacte,qualifie,pertinent,geo,env,proprio,tel,email,situation,age,activite,enfants,q2,canal,date,valide,r1,r2,r3
+Adeline,,,NON,NON,,FROID,ne sait pas,,,celibataire,35-50,oui,2+,,SMS
+Alex,Guille,,OUI,OUI,eloigne,CHAUD,oui,0698360702,,marie,25-35,oui,1-2
+alex,Dompnier,,OUI,NON,,TIEDE,oui,,,marie,25-35,oui,1-2
+Alexandra,Grange,,NON,PEUT ETRE,,FROID,non,+33624132806,,union libre,50-60,oui,2+
+alexandre,prodemial,,,NON,proche,CHAUD,oui,,,marie,35-50,oui,1-2
+alisdair,cousin,,NON,NON,,FROID,oui
+Alison,Derek,,NON,NON,,CHAUD,oui,00441608682302,adbrambles@tiscali.co.uk,marie,60-70,non
+AMEL,ELKHAL,,OUI,OUI,,TIEDE,oui,,,marie,35-50,oui,2+
+Andrée,,,NON,NON,,FROID,oui,+33680362528,,celibataire,60-70,non
+Angelik,Lafon,,OUI,PEUT ETRE,,CHAUD,oui,0681367474,angelique.lafon@goelia.com,celibataire,35-50,oui,2+
+Anna,Podigora,,OUI,NON,,FROID,,0670759424,,celibataire,50-60,oui,2+
+Anne-laure,bp,,OUI,NON,,TIEDE,ne sait pas,+33637345180,,marie,35-50,oui,1-2
+Anthony,Leard,,OUI,OUI,,TIEDE,oui,+33662943085,,marie,35-50,oui,2+
+Arnaud,Carron,,NON,NON,,FROID,,+33768862159,,celibataire,35-50,non
+Audrey,Perrin,,OUI,NON,,TIEDE,oui,+33627551281,audrey73460.perrin@gmail.com,marie,35-50,oui
+aurelie,michel,,OUI,OUI,,FROID
+aurelien,pisciniste,,OUI,OUI,proche,CHAUD,oui
+batailler,veronique,,OUI,PEUT ETRE,,TIEDE,oui
+Béatrice,Perroux,,OUI,PEUT ETRE,,FROID,,0609179323,,union libre,50-60,oui
+benjamin,deleglise,,OUI,OUI,,TIEDE,oui
+bode,estelle,,OUI,OUI,,CHAUD,oui,+33670577989,,celibataire,25-35,oui
+BODE,MARIE,,OUI,OUI,eloigne,CHAUD,oui,,,marie,60-70,oui,1-2
+bourgeois,propriétaire,,OUI,NON,eloigne,CHAUD,oui,,,marie,70+,non,1-2
+Brigitte,le corre,oui,OUI,OUI,proche,CHAUD,oui,+33634957852,,celibataire,70+,non,1-2,,,,,2026-01-15
+brunet,laurence,,NON,NON,,FROID,,0673856572,l.brunet@maulin.ski,marie,50-60,oui
+bruyere,olivia,,NON,OUI,,TIEDE,oui,,olivia.bruyere98@gmail.com,celibataire,25-35,oui,0
+camille,poupaut,,NON,OUI,,FROID
+cardaci,sylvie,oui,OUI,OUI,eloigne,CHAUD,oui,,,marie,50-60,oui,2+,OUI,APPEL
+Caroline,Farge Bertolo,,NON,NON,,TIEDE,oui,0633890414,,marie,60-70,non
+cathy,,,NON,OUI,,FROID,,,,union libre,60-70,non,1-2
+Celine,La Bourguignonne,,OUI,NON,,TIEDE,oui,+33659361644,,union libre,35-50,oui,1-2
+charly,fils francoise,,,OUI,,CHAUD,oui
+chauvin,romane,oui,OUI,OUI,eloigne,TIEDE,oui,0786876718,avocat@romanechauvin.fr,union libre,25-35,oui,0,OUI,APPEL,2025-01-24,validé,2026-02-03,2026-03-12,2026-05-04
+chauvin,angelique,,NON,OUI,,TIEDE,non,,,celibataire,25-35,non,0
+chouchou,Dompnier,,,OUI,,TIEDE,oui,,,marie,60-70,non,1-2
+Christian,Meunier,,,NON,,FROID,,+33675071843,,marie,50-60,oui,1-2
+Christian,Riello,,,OUI,,CHAUD,non,0698106963,riello.christian@hotmail.fr,marie,35-50,oui,2+
+Christine,,,NON,NON,,TIEDE,oui,+33664640196,,marie,50-60,oui,1-2
+christophe,michel,,OUI,OUI,,TIEDE,oui
+Clara,Cardaci,,NON,OUI,,CHAUD,non,0646810994,,marie,25-35,non,1-2
+Clarisse,Montes,,OUI,OUI,,CHAUD,non,+33699329119,,marie,35-50,oui,2+
+Dado,,,NON,NON,,FROID,,+385917399079,,marie,60-70,non
+Daniel,Giraud,,NON,NON,,FROID,,,giraud.daniel@gmail.com,celibataire,50-60,non
+Daniel,Gros,,NON,NON,,FROID,,+33664548338,,union libre,70+,non
+Daniel,Schreck,,NON,NON,,FROID,,+33608032078,daniel.schreck@wanadoo.fr,marie,70+,non
+demarquet,bastien,,OUI,OUI,eloigne,CHAUD,oui,,,union libre,35-50,oui,0
+denise,corlay,,OUI,OUI,,CHAUD,oui,,denisecorlay@aol.com,celibataire,70+,non,1-2
+dominique,debas,oui,OUI,OUI,eloigne,CHAUD,oui,,,union libre,60-70,non,1-2
+dubrez,eric,,OUI,OUI,,CHAUD,oui,,,,,,2+
+DUFOUR,THIBAULT,,NON,NON,,FROID,ne sait pas,,,,,,0
+Eliette,Michel,,OUI,OUI,,TIEDE,oui,0685815052,,marie,35-50,oui,1-2
+Elisa,Gohet,,OUI,OUI,,CHAUD,non,+33646256686,,union libre,35-50,oui,1-2
+Émilie,Philippe,oui,OUI,OUI,eloigne,CHAUD,oui,+33650746107,,marie,35-50,oui,1-2
+Emmanuel,Canavelis,oui,OUI,OUI,eloigne,TIEDE,oui,+33687703006,,union libre,50-60,oui,1-2,OUI,SMS,2026-04-11
+Emmanuel,Gaillet,,OUI,OUI,eloigne,CHAUD,oui,+33768823384,,pacs,35-50,oui,1-2
+eva,cibergigowa,,OUI,OUI,,FROID,,,,marie,35-50,oui,1-2
+Ewan,Kunej,,NON,OUI,,CHAUD,non,+33760561755,,celibataire,25-35,oui,0
+Fabrice,Pamelard,,NON,NON,,FROID,,+33618516334,,marie,35-50,oui
+feuilletine,,,NON,OUI,,CHAUD,oui
+fichet,guillaume,oui,OUI,OUI,proche,CHAUD,non,0630287277,f.guillaume.ert@gmail.com,union libre,50-60,oui,0,OUI,APPEL,2026-01-24,validé,2026-02-05,2026-03-10,2026-04-14
+flora,bruyere,,OUI,PEUT ETRE,,FROID,,,,union libre,25-35,oui,1-2
+Flore Anne,Jan,,OUI,OUI,eloigne,CHAUD,oui,0682722195,raphael.jan@orange.fr,marie,35-50,oui,2+
+francez,jerome,,OUI,PEUT ETRE,,CHAUD,ne sait pas,,francezj@gmail.com
+Franck,Leard,,NON,NON,,CHAUD,non,0664225497,,celibataire,50-60,non
+françoise,voisine,oui,OUI,OUI,,CHAUD,oui
+fred,masseur,,OUI,OUI,,FROID,,,,,35-50
+freddy,,,NON,PEUT ETRE,,FROID,,,,,,,2+
+Frédéric,Dompnier,,OUI,NON,,TIEDE,oui,0687207964,,union libre,50-60,oui,1-2
+frere,thibault,,OUI,OUI,,FROID,,,,,,,1-2
+Gabriel,Callies,,OUI,NON,,FROID,,+33624252541,gabriel.callies@gmail.com
+gaelle,chien,,NON,PEUT ETRE,,FROID,,,,,35-50
+Gaëtan,Beaudouin,,OUI,OUI,,TIEDE,oui,+33627952425,,pacs,35-50,oui,1-2
+Germain,Bernard,,OUI,NON,,FROID,,+33679833314
+Gianfranco,,,OUI,NON,,TIEDE,oui,+33669711070,,marie,50-60,oui,2+
+gladys,Dompnier,,OUI,NON,,TIEDE,oui,,,celibataire,25-35,oui,0
+Glwadys,Ailloux,,OUI,OUI,,TIEDE,oui,0681211003,,pacs,35-50,oui,1-2
+guillaume,sages poterie,,NON,OUI,proche,CHAUD,oui,,,union libre,25-35,oui,0
+guillaume,trochet,,OUI,OUI,,TIEDE,oui
+Guillot,anne gaelle,,OUI,OUI,proche,CHAUD,oui,,bonjour@annegaelleguillot.com,marie,35-50,oui,1-2,OUI,APPEL
+guy,Dompnier,,NON,NON,,TIEDE,oui,,,veuf,60-70,non,1-2
+hamalian,laurence,,NON,NON,,FROID,,0632177541,,union libre,50-60,oui
+interhome,laurence,,NON,NON,,FROID,,+33642125464,,celibataire,50-60,oui
+Irwin,chapelaz,,OUI,OUI,,FROID,,,,union libre,35-50,oui,1-2
+isabelle,,,NON,OUI,,FROID,,,,,,,2+
+Ivanka,,,NON,NON,,CHAUD,non,0683640644,,celibataire,70+,non,2+
+James,Carter,,NON,NON,,FROID,,+4407976956680,,celibataire,50-60
+Jan,Sebastian,,NON,NON,,FROID,ne sait pas,0034626977213,,union libre,35-50
+jane,Dompnier,,NON,OUI,,FROID,,,,celibataire,25-35,oui,0
+jane,chien,,OUI,PEUT ETRE,,FROID,,,,,25-35
+Janig,Cercel,,OUI,OUI,eloigne,CHAUD,oui,+33643755824,,pacs,35-50,oui,1-2
+Jean-pierre,Michel,,NON,NON,,TIEDE,oui,0681189642,,celibataire,70+,non
+Jeoffrey,,,OUI,OUI,,CHAUD,non,0768233734,,union libre,35-50,oui,0
+Jeremie,Lunik Orion,,OUI,NON,,FROID,,+33603255461,,union libre,35-50,oui,1-2
+Jo,Allamano,,NON,PEUT ETRE,eloigne,CHAUD,oui,+33661945736,,marie,50-60,oui,1-2
+johan et melville,oncle et tante,,NON,NON,,FROID,oui
+julia,Goelia,,OUI,OUI,,CHAUD,ne sait pas,,,,35-50
+Julie,Bouarab,,NON,PEUT ETRE,,CHAUD,non,+33783601796,,marie,35-50,oui,1-2
+Kenneth,Mann,oui,OUI,OUI,,CHAUD,oui,0675860959,kmann433@gmail.com,celibataire,50-60,oui,1-2
+Kevin,Otero,,OUI,OUI,eloigne,CHAUD,ne sait pas,+33615797484,,union libre,35-50,oui,1-2
+Ko,Kunej,,NON,NON,,FROID,,+33680252626,koraljka.kunej@orange.fr,celibataire,50-60,oui,1-2
+La Vieille Mamie,,,NON,NON,eloigne,CHAUD,oui,0695040756,,veuve,70+,non,2+
+landouar,lenaig,,NON,OUI,proche,CHAUD,oui,,l.landouar@gmail.com,union libre,35-50,oui,1-2
+le bozec,gael,,OUI,NON,proche,CHAUD,oui,,,marie,35-50,oui,1-2
+le scanf,floriane,,OUI,OUI,proche,CHAUD,ne sait pas,,floriane.lescanf.orthophonie@gmail.com,union libre,35-50,oui
+lea,,,,OUI,,FROID,,,,,,,2+
+lea,voisine,,NON,NON,,CHAUD,non,,,union libre,35-50,non,1-2
+leo,Dompnier,,OUI,PEUT ETRE,,TIEDE,non,,,celibataire,25-35,oui,0
+Lilia,Bouarab,,NON,NON,,CHAUD,non,0768212322,,celibataire,18-25,non,1-2
+Lise,Bacaria,,NON,NON,,FROID,,0635353528,,celibataire,35-50,oui,1-2
+lou,chapelaz,,OUI,OUI,,FROID,,,,celibataire,25-35,oui,0
+Louise,Dompnier,,OUI,NON,,TIEDE,oui,0667189292,,pacs,35-50,oui,1-2
+Luc,Augert,,OUI,OUI,,FROID,,+33674700748,,celibataire,35-50,oui,0
+magali,Grange,,NON,PEUT ETRE,,FROID,ne sait pas
+Maignant,Venusia,oui,OUI,OUI,eloigne,CHAUD,oui,0674373117,venusia.michel@hotmail.fr,marie,25-35,oui,1-2
+Maignant,etienne,oui,OUI,OUI,eloigne,CHAUD,oui,,,marie,25-35,oui,1-2,,APPEL
+Mamoune,,,NON,NON,,CHAUD,non,0661781052,,celibataire,60-70,non,1-2
+Manon,Sonsogni,,OUI,OUI,,TIEDE,ne sait pas,+33666613646,,celibataire,35-50,oui,0
+maria,belle soeur sylvie,,OUI,PEUT ETRE,,FROID,,,,,,,2+
+marianne,,,OUI,OUI,,FROID
+Marie,Calmette,,NON,NON,,FROID,,+33676712439,,celibataire,35-50,oui,0
+Marie,Humbert,,NON,NON,,CHAUD,oui,+33674412900,,celibataire,70+,non,1-2
+marie christine,,,OUI,OUI,,FROID,,,,union libre,60-70,oui,0
+Marino,Dompnier,,OUI,OUI,,CHAUD,oui,+33680010178,,celibataire,50-60,non,1-2
+Marion,Arlaud,,OUI,OUI,,TIEDE,oui,0625587415,,marie,35-50,oui,2+
+Maryline,Collet,,NON,OUI,,TIEDE,oui,0678146967,,veuve,50-60,oui,1-2
+Maryse,Maulin,,NON,NON,,FROID,,+33682640837,,pacs,70+,non,1-2
+maryvonne,,,NON,OUI,,FROID,,,,,,,2+
+Mathias,Bochet,,NON,OUI,,TIEDE,oui,0680844301,,marie,35-50,oui,1-2
+Mathieu,,,OUI,OUI,,CHAUD,non,+33677380682,,celibataire,25-35,oui
+Matthieu,Lirhmann,,OUI,NON,,FROID,,+33674671663,,union libre,50-60,oui,1-2
+Maxime,Mac'sim,,OUI,OUI,,TIEDE,oui,0668491417,,pacs,35-50,oui,1-2
+melissa,,,OUI,OUI,,FROID,,,,,,,2+
+michel,gerard,,OUI,OUI,,CHAUD,oui,,,celibataire,70+,non,2+
+mickael,deleglise,,OUI,OUI,,TIEDE,oui
+Mima,,,NON,NON,,FROID,,+385915823463,,marie,70+,non
+Mireille,Kunej,oui,OUI,NON,,CHAUD,non,+33760526465,mireille.kunej@bbox.fr,celibataire,60-70,non,1-2
+Moise,,,NON,NON,,FROID,,0745157560,,celibataire,35-50
+MS,,,NON,OUI,,CHAUD,non,+33673116107,,celibataire,25-35,oui
+Muriel,Deleglise,,OUI,OUI,,TIEDE,oui,+33750584398,,celibataire,50-60,oui,1-2
+natacha,,,,PEUT ETRE,,FROID,,,,,,,2+
+Nathalie,Bruyère,,OUI,NON,,TIEDE,oui,+33699685169,,marie,50-60,oui,1-2
+Nathalie,lemignot,oui,OUI,OUI,,CHAUD,oui,+33676838229,,celibataire,35-50,non,1-2
+orlane,,,OUI,OUI,,CHAUD,oui,,,,25-35
+Papi,,,NON,NON,,FROID,,0646232669,trsat@hotmail.fr,marie
+Philippe,Caudoux,,NON,NON,,FROID,,+33617976953,,union libre,60-70,oui
+Philippe,Vatinel,,OUI,OUI,,TIEDE,oui,+33609489041,,celibataire,50-60,oui
+Philou,,,NON,NON,,CHAUD,oui,0676159590,,celibataire,50-60,non
+Philippe,Emilie,oui,OUI,OUI,proche,TIEDE,oui,0650746107,,marie,35-50,oui,1-2,OUI,SMS,2026-04-11
+poussard,aurelie,,NON,OUI,,TIEDE,non,,,union libre,35-50,oui,2+
+poussard,jerome,,OUI,OUI,,FROID,,,,union libre,50-60,oui,1-2
+Rachid,Goelia,,OUI,OUI,eloigne,CHAUD,ne sait pas,0651747388,,union libre,35-50,oui,1-2
+rame,christophe,,OUI,PEUT ETRE,,TIEDE,oui
+Raphael,Champlong,,NON,NON,,FROID,,0688374181,r.champlong@free.fr,marie,50-60,oui,1-2
+Redouane,Bouarab,,NON,OUI,,TIEDE,non,+33782835321,,marie,50-60,oui,1-2
+Roberto,,,OUI,OUI,,TIEDE,oui,0687124692,,union libre,50-60,oui,0
+rona,cousine,,NON,NON,,FROID,oui
+Salima,,,NON,NON,,FROID,,+33631957645,,celibataire,50-60,oui,1-2
+salvatore,neveu sylvie,,OUI,PEUT ETRE,,FROID,,,,,,,2+
+Sandra,,,OUI,PEUT ETRE,,CHAUD,ne sait pas,+33672825276,,celibataire,50-60,oui,1-2
+sarah,niece sylvie,,OUI,OUI,,FROID,,,,,,,2+
+Sarah,Cardaci,,OUI,OUI,,CHAUD,non,0770280328,sarahc02@hotmail.fr,celibataire,25-35,oui,1-2
+sculpture,david,,,OUI,,TIEDE,ne sait pas,0664332430,,marie,35-50,oui
+Severine,Teyssier,,OUI,NON,,TIEDE,oui,+33632428566,teyssierpascal07@outlook.fr,marie,50-60,oui,1-2
+Sihame,El Horfi,,OUI,OUI,,TIEDE,oui,+33665651729,,celibataire,35-50,oui,1-2
+Simon,Cardaci,,NON,NON,,CHAUD,non,0761708332,tutututt@hotmail.fr,celibataire,35-50,non
+Snezana,,,NON,NON,,FROID,,0677756041,,marie,70+,non
+Stéphane,Paquereau,,,OUI,,FROID,,0786222560,,marie,50-60,oui
+Stephanie,Annic,,OUI,OUI,,TIEDE,oui,0619127200,josteannic@orange.fr,marie,50-60,oui,1-2
+Stephanie,Deniset,,OUI,NON,,FROID,,+33686433867,stephanie.deniset@orange.fr,pacs,50-60,oui,1-2
+Sylvain,Lambert,,OUI,NON,,CHAUD,oui,0632130607,sylvain.lambert64@orange.fr,marie,35-50,oui,1-2
+sylvie,le montreer,oui,OUI,OUI,,CHAUD,oui,,,,60-70
+Sylvie,Cardaci,oui,OUI,OUI,eloigne,CHAUD,oui,+33614725356,sylvie.cardaci@gmail.com,marie,50-60,oui,1-2
+terrier,Stephane,,NON,OUI,proche,CHAUD,ne sait pas,,sterrier8@gmail.com,marie,35-50,oui
+theo,,,,OUI,,FROID
+thibault,voisin,,OUI,OUI,,CHAUD,non,,,,25-35,,1-2
+Thomas,lentzy,,OUI,OUI,,FROID,,0750357863,,union libre,35-50,oui
+Timothée,Verdron,,OUI,OUI,eloigne,CHAUD,oui,+33637452677,,union libre,35-50,oui,1-2
+Tony,Montana,,OUI,OUI,,CHAUD,non,0649924161,chlokun.ck@gmail.com,celibataire,25-35,oui
+valerie,leard,,,NON,,FROID
+Vero,Marie's Loux,,NON,NON,,FROID,,0665192121,,celibataire,60-70,non
+Victoria,Kun,,OUI,OUI,,CHAUD,non,+33634555202,kunj.vic@gmail.com,celibataire,18-25,oui
+Vincent,Chaumery,,OUI,NON,,FROID,,0786951937,,celibataire,35-50,oui
+Will,,,OUI,OUI,,TIEDE,oui,0622306136,,celibataire,50-60,oui,1-2
+famille lucas,alina,,NON,NON,proche,TIEDE,non,,,marie,35-50,non,1-2
+lionel,vignoud,oui,OUI,OUI,proche,CHAUD,ne sait pas,,,union libre,50-60,oui
+chantal,,,OUI,OUI,proche,CHAUD,oui,,,marie,50-60,oui,1-2
+dominique,Guilleminot,,OUI,OUI,proche,CHAUD,oui,,,marie,60-70,oui,1-2
+famille Aelis,,,OUI,OUI,proche,CHAUD,oui,,,marie,35-50,oui,1-2
+marie-laure,voisine,,OUI,OUI,proche,CHAUD,oui,,,marie,60-70,oui,1-2
+philippe,guiziou,,OUI,OUI,proche,CHAUD,oui,,,union libre,35-50,oui
+willy,fils francoise,,OUI,OUI,,CHAUD,oui
+y.decler@meilleurtaux.com,,,,OUI,,FROID</script>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= constantes ================= */
+const NB_RDV = 6;
+const CHAMPS = [
+  ['prenom','Prénom','text'], ['nom','Nom','text'],
+  ['tel','Téléphone','text'], ['email','E-mail','text'],
+  ['env','Relation',['','CHAUD','TIEDE','FROID']],
+  ['geo','Géographie',['','proche','eloigne']],
+  ['situation','Situation',['','celibataire','marie','pacs','union libre','veuf','veuve']],
+  ['age','Âge',['','18-25','25-35','35-50','50-60','60-70','70+']],
+  ['enfants','Enfants',['','0','1-2','2+']],
+  ['proprio','Propriétaire',['','oui','non','ne sait pas']],
+  ['activite','En activité',['','oui','non']],
+  ['qualifie','Qualifié',['','OUI','NON']],
+  ['pertinent','Pertinent',['','OUI','NON','PEUT ETRE']]
+];
+const MSG_DEF = [
+  {id:'m1', t:'Prise de contact', canal:'sms', objet:'',
+   v:"Bonjour {prenom}, c'est {moi}. J'accompagne aujourd'hui des particuliers sur l'organisation de leur patrimoine. Aurais-tu 20 minutes cette semaine pour en échanger, sans engagement ?"},
+  {id:'m2', t:'Relance', canal:'sms', objet:'',
+   v:"Bonjour {prenom}, je reviens vers toi suite à mon message. Si ce n'est pas le bon moment je comprends — sinon, donne-moi deux créneaux et je m'adapte. {moi}"},
+  {id:'m3', t:'Confirmation de rendez-vous', canal:'sms', objet:'',
+   v:"Bonjour {prenom}, c'est noté pour notre rendez-vous du {rdv}. Prévois environ une heure, rien à préparer. À très vite, {moi}"},
+  {id:'m4', t:'Remerciement après rendez-vous', canal:'sms', objet:'',
+   v:"Bonjour {prenom}, merci pour notre échange. Je prépare la synthèse dont on a parlé et je reviens vers toi très vite. Bonne journée, {moi}"},
+  {id:'m5', t:'Invitation à rejoindre l\'équipe', canal:'sms', objet:'',
+   v:"Bonjour {prenom}, au-delà du conseil, je développe une équipe et je pense à toi. Ça te dirait d'en parler 20 minutes ? Aucun engagement. {moi}"},
+  {id:'m6', t:'Reprise de contact', canal:'mail', objet:'Un point rapide ensemble ?',
+   v:"Bonjour {prenom},\n\nCela fait un moment que nous n'avons pas échangé. Je me permets de reprendre contact : certains sujets évoqués à l'époque ont évolué.\n\nUn échange rapide te conviendrait-il ?\n\nBien à toi,\n{moi}"}
+];
+const VARS = ['{prenom}','{nom}','{moi}','{tel}','{rdv}'];
+
+/* ================= stockage ================= */
+const K = {d:'pdm3_data', c:'pdm3_cfg', m:'pdm3_msg', l:'pdm3_logo', s:'pdm3_sync', x:'pdm3_dels'};
+const memo = {};
+const get = k => { try{ return localStorage.getItem(k); }catch(e){ return memo[k]??null; } };
+const set = (k,v) => { try{ localStorage.setItem(k,v); }catch(e){ memo[k]=v; } };
+const rj = (k,d) => { try{ const v=JSON.parse(get(k)); return v??d; }catch(e){ return d; } };
+
+let data = rj(K.d, null);
+let cfg  = Object.assign({prenom:'', tel:'', sig:''}, rj(K.c,{}));
+let msgs = rj(K.m, null) || JSON.parse(JSON.stringify(MSG_DEF));
+const LOGO_DEFAUT = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAIAAyAMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAABgcBBAUDCAL/xABDEAABAwMBBAUIBQoHAQAAAAAAAQIDBAURBhIhMUEHIlFxkRMUUmGBobHBMjOSotEVJENTYnJzgrLwIzSEwtLh4hb/xAAaAQEAAgMBAAAAAAAAAAAAAAAABAUCAwYB/8QALBEAAgIBAwMBBgcAAAAAAAAAAAECAxEEITEFEhNBFDJRYYGRFSNCUnGh8P/aAAwDAQACEQMRAD8AvEAAAAAAAAAAAAAAAAAAAAGBk8pEmX6p7G/vMz8zg3Zmq3bX5LqLY1OW3G/a+aHjZnCPc8ZwNTXiC23GyRyytR0tXhUXk1WObnxchIkXPPefPmqI71HdV/8AoPKrVqnVV29FTO7Zxuxw4FgaWh10ykjSSSmbAiJsNrkVX4/l3+KmmFrcmsFjqNBGumMlNf74FiGTRpkuO7zp9N6/Jsd81N03lYzIAB4AAAAAAAAAAAAAAAAAAAAAYMZXtMkT1/qT8hWlW0zk89qOrCmPo9rvZ8VPJSUVlmyquVs1CPLOvJqKzx1D6eS6UjJWLsuY6VrVRezedCOZsrEfFI17V4OauUwfNK9ZVVd6quVXtXtJXoHVTrDXeb1L80M7uun6tfST5kaOoy8MuL+jOFblB5a9C8DGD8RyNkYj2PRzXJlFTmh6EooyPaktcFfcrG+WNqrFVquV7Eje7HiieBIERE4Ia9TAsk9K9P0UquX7Dk+ZsnmDKUm0k/QYQyAemIAAAAAAAAAAAAAAAAABgH5V2DOV/veAfoAAGFKC15XPuOqK5znKscUixRpyRG7vjlS/T511Fb6u3XiphronMkdI53qcirnKLzI2pz2oueiqPlk3zg5oHinebNtoprjWwUlM1zpJXo1MJwz29hDSydJKSim2XloKOWPSVuSoc5z1izlV37KrlPdgkJq0lPHQ0UMDOrHDG1iZXgiJg4V311Y7WqsdVecSp+jp0218eHvLPKit2cQ4zvsbgs5ZJsIM44lR3bpRuM6ujtdNFStx9ZJ1396Jw8SQ9F94ut3huD7nM+eNr2+TlVqJv37Sbk7jBXRk8IkW9Ouqqds9iegA2kEAAAAAAAAAAAAAAAAAAiPSU+eDTElVRzywSwyscjonK1d645fvFaUuu9SUqNRte6RM8JI2uz7cZLuuVDBcqGajqmbcMrNl7UXBWl66LZo9qWy1aSJj6qo3Knc5OPuI90Z5zFlx0+/SqHjvS+qNak6U7uxyedUdJKznsI5i+OVQ7NH0r0bv87bZ4v4b0f8AHBW91stxtT1bcaKaHseqZb9pNymhv5cveaPNZHktfw7R2rMV9mXhS9ImnZ12Vq5IndkkTvkinvPeNKXqLyVTV26oZybM5u7u2uBRGN2OQMvaX6o0Po1SeYSaLrWz6Go/8V7La1P25kcngqnPuGvNPWaJzLFTRVEq/qWJGz2rj4FSDnk8eo+CwZx6VFv82bkdm/anut8e51bUuSJdyQR9RiJ3c/acbCYxyBsUFFUXGsipKSNZJpXbLUT4+r1mluUmWUYV0w2WEjoaW09U6iuTKaFFSFq5mkVN0bfx7C97Xb6a10MVHSMSOGNMImOPrNTTViprBa46SBqK/cssnN7u1TsYJ9VfYvmcpr9a9TPb3VwZABtK8AAAAAAAAAAAAAAAAAAxhBhDIAPxJHHI1WyMa5q8UcmSD6utmjrQxlVcrbh8ztlrabaaq9q4RUJwru0oXXN8W+X6aRr800C+ShTj1U4r7VNN0lFbosem0zutwpNJc4O42n6O6relXW0q+iu0vvwqe89Wac0PVJ+b6ikj/iPanxRCvsIvFEXvGCJ5F6xRfvRSXu2yLGb0fWWodil1LE9fRTYcv9SGw3ophcmUvTl/06f8ise7d3HtFV1MLdmGomYnY16oe98P2mL0ur/Td/SLKToniwmbw/1r5v8A+iV6a0nbdOtV1K10lQ5MOmlwrlTs9RpdGcdSumI56yeSZ08jns8o5XKjU3Jx7lX2kuwS4Qgkmkc9qtVqHJ1TnlIYQyAbSEAAAAAAAAAAAAAAAAAAAAAYGQR/W92qbLp2praNWpO1WNarkyiKrkTPhk8bwsmdcHZNQXLM63rpLfpmump9tZfJ7DVYmVblcZKC5b8cuHL2cie2vpPuEKbF1pYapjuLmdR3hwU3p7r0fXVvnVdRugm5xtje1fubiJY42cM6DRxt0KcZ1t59VuVpnKZT8cmzSW6urVxR0lRP/DiV3wJumr9K29cWnTbZHp9F8zWovj1lPCr6TrrI3YoaSkpW9uFcvjw9xr7ILlk32jUz9yvH8s5NNobUlSxrmW18aL+te1qp7FXPuOpD0X3x+FfPRRpzRZHL/tOdJr7Uz+sly2U/ZhZ+B6x9IepWbOapjselA3f4Ierw/M1TXUHw4oua3UcdBQ09JD9CFiMb7DbI3oW7V17sSVtybGkjpXNasaKiKibs7/XnwJITovK2OXthKE3GXKMgA9MAAAAAAAAAAAAAAAAAAAAADBHdd0yVWk7jHzbF5REx6K7XyJER/V+o6fTtsdO9GyTydWGJV+mvr9ScVMZ47Xk20KXlj2LLyUHhETCjHamfYTdekFtU5v5VsNuq059XHx2jch1Doat3V9hSl/aji3fdwvuIPZF8SOrervhvKp/TcrzA55Lxi0HpWWJkjLYqtc1FT84l3/eNO49G9iqI080ZNSO9JkiuT72TL2aWCOutUZw00U1gEo1Hoe62VHTRt87pETKyxNyre9OXv7yPUNHU19QyCkhfLI52zhjVXCmpwaeGixhqK7Id8ZbF7aGpFpNJ22N3F0O39rrfM75r0VO2lpIaeP6MTGsTuRMGyWSWFg4myXfNy+LAAPTAAAAAAAAAAAAAAAAAAAAAA8KmeOmp5J55EZFG1XPevBEQoHVd9l1Bd5Kt20kKLswM9FnHxXiTvpav3kqZllp5OvL16jfwbyb7f74lWEPUWb9qOj6PpO2Pmly+AETHAG9ZLe+6Xalo4kV3lZERccm53+CZIyW5dTkoxbfB9B23dbaVMYXyTd3sIV0v1j4LRSU0cjmLNNlyIuNprU/FUJ+1rWtRrUwiJhCqOmSpY+42+ma7L4onvcn7ypj+lSwueIM5Hp8FZqo/ci1q1Ze7U/NNXSOjRfq5l22d2/OPYWdoPU9BemyU0dJFSVjG7T2RNREf2uT1b0KWwhJOjur8y1bRKv0ZVWJf5v8AvBFqskpJMvtfoq50yklhovjBkAnnJAAAAAAAAAAAAAAAH//Z';
+let logo = get(K.l) || LOGO_DEFAUT;
+let sync = Object.assign({url:'', token:'', auto:true, last:''}, rj(K.s,{}));
+let dels = rj(K.x, []);
+
+let vue='accueil', typeCur='investisseur', fiche=null, filtre='', rdvOpen=null, editMsg=null;
+let enCours=false;
+
+/* ================= utilitaires ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const uid = () => 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+const today = () => iso(new Date());
+function fmtD(s){ if(!s) return ''; const p=String(s).split('-'); return p.length===3? p[2]+'/'+p[1]+'/'+p[0] : s; }
+function fmtLong(s){ if(!s) return ''; const d=new Date(s+'T00:00:00'); if(isNaN(d)) return s;
+  return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function diff(s){ if(!s) return null; const a=new Date(s+'T00:00:00'), b=new Date(today()+'T00:00:00'); return Math.round((a-b)/86400000); }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toast.k); toast.k=setTimeout(()=>t.classList.remove('on'),2400); }
+function initials(p){
+  const a=(p.prenom||'').trim(), b=(p.nom||'').trim();
+  return ((a[0]||b[0]||'?')+(b[0]||a[1]||'')).toUpperCase();
+}
+const nomComplet = p => ((p.prenom||'')+' '+(p.nom||'')).trim() || '(sans nom)';
+const prenomDe = p => (p.prenom||'').trim() || (p.nom||'').trim();
+function telNorm(p){
+  let s=String(p.tel||'').replace(/[\s.\-()]/g,'');
+  if(!s) return '';
+  if(/^0[1-9]\d{8}$/.test(s)) return '+33'+s.slice(1);
+  if(s.startsWith('00')) return '+'+s.slice(2);
+  return s;
+}
+function mailDe(p){
+  const c=[p.email,p.tel].find(x=>x && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x));
+  return c||'';
+}
+function save(){ set(K.d, JSON.stringify(data)); }
+function saveCfg(){ set(K.c, JSON.stringify(cfg)); }
+function saveMsg(){ set(K.m, JSON.stringify(msgs)); }
+function saveSync(){ set(K.s, JSON.stringify(sync)); }
+function saveDels(){ set(K.x, JSON.stringify(dels)); }
+function touch(p){ if(p) p.maj = new Date().toISOString(); }
+
+/* ================= amorçage des données ================= */
+function parseCSV(txt){
+  const out=[]; let r=[], f='', q=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i];
+    if(q){ if(c==='"'){ if(txt[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ r.push(f); f=''; }
+    else if(c==='\n'){ r.push(f); out.push(r); r=[]; f=''; }
+    else if(c!=='\r') f+=c;
+  }
+  if(f||r.length){ r.push(f); out.push(r); }
+  return out;
+}
+function nouveau(type){
+  return {id:uid(), type:type, prenom:'', nom:'', tel:'', email:'', env:'', geo:'',
+    situation:'', age:'', enfants:'', proprio:'', activite:'', qualifie:'', pertinent:'',
+    rdv:[], notes:[], cree:today(), archive:false, motif:'', archDate:'', maj:new Date().toISOString()};
+}
+function seed(){
+  const lignes = parseCSV($('#seed').textContent.trim()).slice(1);
+  return lignes.map(a=>{
+    const p = nouveau('investisseur');
+    p.nom=(a[0]||'').trim(); p.prenom=(a[1]||'').trim();
+    p.qualifie=(a[3]||'').trim(); p.pertinent=(a[4]||'').trim();
+    p.geo=(a[5]||'').trim(); p.env=(a[6]||'').trim(); p.proprio=(a[7]||'').trim();
+    p.tel=(a[8]||'').trim(); p.email=(a[9]||'').trim();
+    p.situation=(a[10]||'').trim(); p.age=(a[11]||'').trim();
+    p.activite=(a[12]||'').trim(); p.enfants=(a[13]||'').trim();
+    [18,19,20].forEach((ix,k)=>{
+      const d=(a[ix]||'').trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(d)) p.rdv[k]={date:d, heure:'', statut: diff(d)<0?'done':'plan', note:''};
+    });
+    if((a[2]||'').trim().toLowerCase()==='oui')
+      p.notes.push({d:(a[16]||today()), t:'Premier contact déjà pris'+(a[15]?' ('+a[15].toLowerCase()+')':'')+'.'});
+    return p;
+  }).filter(p=>p.nom||p.prenom);
+}
+if(!data){ data = seed(); save(); }
+data.forEach(p=>{ p.rdv=p.rdv||[]; p.notes=p.notes||[]; if(!p.type) p.type='investisseur'; if(!p.maj) p.maj=new Date(2020,0,1).toISOString(); if(p.motif===undefined) p.motif=''; if(p.archDate===undefined) p.archDate=''; });
+
+/* ================= rendez-vous ================= */
+function rdvDe(p,i){ return p.rdv[i] || {date:'',heure:'',statut:'',note:''}; }
+function prochainRdv(p){
+  let best=null;
+  (p.rdv||[]).forEach((r,i)=>{
+    if(!r || !r.date || r.statut==='done' || r.statut==='annule') return;
+    if(!best || r.date < best.date) best={i, date:r.date, heure:r.heure||''};
+  });
+  return best;
+}
+function etatDate(d){
+  const n=diff(d);
+  if(n===null) return '';
+  if(n<0) return 'late';
+  if(n===0) return 'today';
+  return 'soon';
+}
+function nbFaits(p){ return (p.rdv||[]).filter(r=>r&&r.statut==='done').length; }
+
+/* ================= navigation ================= */
+function go(v){
+  vue=v;
+  $$('.view').forEach(s=>s.classList.remove('on'));
+  const map={accueil:'v-accueil', investisseurs:'v-liste', filleuls:'v-liste', archive:'v-liste', messages:'v-messages', reglages:'v-reglages', fiche:'v-fiche'};
+  $('#'+map[v]).classList.add('on');
+  $$('.nb').forEach(b=>b.classList.toggle('on', b.dataset.go===v));
+  if(v==='investisseurs'){ typeCur='investisseur'; filtre=''; renderListe(); }
+  if(v==='filleuls'){ typeCur='filleul'; filtre=''; renderListe(); }
+  if(v==='archive'){ typeCur='archive'; filtre=''; renderListe(); }
+  if(v==='accueil') renderAccueil();
+  if(v==='messages') renderMessages();
+  if(v==='reglages') renderReglages();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+/* ================= accueil ================= */
+function renderAccueil(){
+  const inv = data.filter(p=>p.type==='investisseur' && !p.archive);
+  const fil = data.filter(p=>p.type==='filleul' && !p.archive);
+  $('#heroHello').textContent = 'Bonjour'+(cfg.prenom?' '+cfg.prenom:'');
+  $('#heroDate').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('#heroLogo').innerHTML = logo
+    ? `<img src="${logo}" alt="Prodemial">`
+    : `<div class="ph"><div class="mk">◆</div><div><div style="font-family:'Outfit';font-size:26px;font-weight:600">Prodemial</div><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Dépose ton logo dans Réglages</div></div></div>`;
+
+  const rdvs = [];
+  data.filter(p=>!p.archive).forEach(p=>{ const r=prochainRdv(p); if(r) rdvs.push({p,r}); });
+  const retard = rdvs.filter(x=>etatDate(x.r.date)==='late').length;
+  const sem = rdvs.filter(x=>{ const n=diff(x.r.date); return n>=0 && n<=7; }).length;
+
+  const arc = data.filter(p=>p.archive).length;
+  $('#heroStats').innerHTML = [
+    [inv.length,'Investisseurs','investisseurs'],
+    [fil.length,'Filleuls','filleuls'],
+    [sem,'Rendez-vous sous 7 jours',''],
+    [retard,'En retard',''],
+    [arc,'Archivés','archive']
+  ].map(s=>`<div class="hz" ${s[2]?`data-go="${s[2]}"`:''}><div class="n">${s[0]}</div><div class="l">${s[1]}</div></div>`).join('');
+
+  rdvs.sort((a,b)=>a.r.date.localeCompare(b.r.date));
+  const L = rdvs.slice(0,12);
+  $('#todo').innerHTML = L.length ? L.map(({p,r})=>{
+    const st=etatDate(r.date);
+    const pill = st==='late'?'<span class="pill late">En retard</span>'
+               : st==='today'?'<span class="pill today">Aujourd\'hui</span>'
+               : '<span class="pill soon">À venir</span>';
+    return `<div class="row">
+      ${pill}
+      <div class="av ${p.env||'NA'}" style="width:38px;height:38px;border-radius:12px;font-size:13px">${initials(p)}</div>
+      <div class="g">
+        <div class="nm">${esc(nomComplet(p))}</div>
+        <div class="s">R${r.i+1} · ${fmtLong(r.date)}${r.heure?' à '+r.heure:''} · ${p.type==='filleul'?'filleul':'investisseur'}</div>
+      </div>
+      <button class="btn sm sec" data-open="${p.id}">Ouvrir la fiche</button>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="ic">🗓️</div>Aucun rendez-vous programmé. Ouvre une fiche et pose une date sur R1.</div>';
+
+  majCompteurs();
+  $('#navLogo').innerHTML = logo ? `<img src="${logo}" alt="">` : '<span class="mk">◆</span>';
+}
+function majCompteurs(){
+  const nInv = data.filter(p=>p.type==='investisseur'&&!p.archive).length;
+  const nFil = data.filter(p=>p.type==='filleul'&&!p.archive).length;
+  const nArc = data.filter(p=>p.archive).length;
+  $('#nInv').textContent = nInv; $('#nInvTb').textContent = nInv||'';
+  $('#nFil').textContent = nFil; $('#nFilTb').textContent = nFil||'';
+  $('#nArc').textContent = nArc;
+}
+
+/* ================= liste ================= */
+function pool(){
+  if(typeCur==='archive') return data.filter(p=>p.archive);
+  return data.filter(p=>p.type===typeCur && !p.archive);
+}
+function filtrer(){
+  const q=norm($('#q').value);
+  let L = pool().filter(p=>{
+    if(q){
+      const h = norm([p.prenom,p.nom,p.tel,p.email,(p.notes||[]).map(n=>n.t).join(' ')].join(' '));
+      if(!h.includes(q)) return false;
+    }
+    if(typeCur==='archive'){
+      if(filtre==='refus') return p.motif==='refus';
+      if(filtre==='suite') return p.motif==='suite';
+      if(filtre==='investisseur'||filtre==='filleul') return p.type===filtre;
+      return true;
+    }
+    if(filtre==='CHAUD'||filtre==='TIEDE'||filtre==='FROID') return p.env===filtre;
+    if(filtre==='rdv') return !!prochainRdv(p);
+    if(filtre==='late'){ const r=prochainRdv(p); return r && etatDate(r.date)==='late'; }
+    if(filtre==='sans') return !prochainRdv(p) && nbFaits(p)===0;
+    if(filtre==='encours') return nbFaits(p)>0;
+    return true;
+  });
+  const s=$('#sortBy').value;
+  const ordre={CHAUD:0,TIEDE:1,FROID:2};
+  L.sort((a,b)=>{
+    if(typeCur==='archive') return String(b.archDate||'').localeCompare(String(a.archDate||''));
+    if(s==='rdv'){ const x=prochainRdv(a), y=prochainRdv(b); return (x?x.date:'9999').localeCompare(y?y.date:'9999'); }
+    if(s==='chaud'){ const d=(ordre[a.env]??9)-(ordre[b.env]??9); if(d) return d; }
+    if(s==='recent') return String(b.cree||'').localeCompare(String(a.cree||''));
+    return norm(nomComplet(a)).localeCompare(norm(nomComplet(b)));
+  });
+  return L;
+}
+function renderListe(){
+  const estInv = typeCur==='investisseur';
+  const estArc = typeCur==='archive';
+  $('#lTitle').textContent = estArc?'Archive':(estInv?'Investisseurs':'Filleuls');
+  $('#lSub').textContent = estArc
+    ? 'Prospects classés sans suite — investisseurs et filleuls confondus'
+    : (estInv ? 'Les personnes à qui tu proposes un accompagnement patrimonial'
+              : 'Les personnes que tu accompagnes vers l\'activité');
+  $('#addTitle').textContent = estInv?'Nouvel investisseur':'Nouveau filleul';
+  $('#btnAdd').textContent = estInv?'＋ Ajouter un investisseur':'＋ Ajouter un filleul';
+  $('#btnAdd').style.display = estArc?'none':'';
+  if(estArc) $('#addBox').classList.remove('on');
+
+  const P = pool();
+  const n = f => P.filter(f).length;
+  const chips = estArc ? [
+    ['','Tous',P.length],
+    ['refus','Refus',n(p=>p.motif==='refus')],
+    ['suite','Sans suite',n(p=>p.motif==='suite')],
+    ['investisseur','Investisseurs',n(p=>p.type==='investisseur')],
+    ['filleul','Filleuls',n(p=>p.type==='filleul')]
+  ] : [
+    ['','Tous',P.length],
+    ['CHAUD','Chauds',n(p=>p.env==='CHAUD')],
+    ['TIEDE','Tièdes',n(p=>p.env==='TIEDE')],
+    ['FROID','Froids',n(p=>p.env==='FROID')],
+    ['rdv','Avec rendez-vous',n(p=>!!prochainRdv(p))],
+    ['late','En retard',n(p=>{const r=prochainRdv(p);return r&&etatDate(r.date)==='late';})],
+    ['encours','Parcours entamé',n(p=>nbFaits(p)>0)],
+    ['sans','Jamais rencontrés',n(p=>!prochainRdv(p)&&nbFaits(p)===0)]
+  ];
+  $('#chips').innerHTML = chips.map(c=>`<button class="ch${filtre===c[0]?' on':''}" data-ch="${c[0]}">${c[1]}<span class="n">${c[2]}</span></button>`).join('');
+
+  const L = filtrer();
+  $('#grid').innerHTML = L.length ? '<div class="grid">'+L.map(p=>{
+    const r = prochainRdv(p), st = r?etatDate(r.date):'';
+    const dots = Array.from({length:NB_RDV},(_,i)=>{
+      const x=rdvDe(p,i);
+      const cl = x.statut==='done'?' done' : (x.date&&x.statut!=='annule')?' plan' : '';
+      return `<span class="dot${cl}">${i+1}</span>`;
+    }).join('');
+    const coord = [p.tel?'📱':'', mailDe(p)?'✉️':''].filter(Boolean).join(' ');
+    return `<div class="pcard" data-open="${p.id}">
+      <div class="top">
+        <div class="av ${p.env||'NA'}">${initials(p)}</div>
+        <div style="min-width:0">
+          <div class="nm">${esc(nomComplet(p))}</div>
+          <div class="mt">${coord} ${esc(p.tel||mailDe(p)||'Pas de coordonnées')}</div>
+        </div>
+      </div>
+      <div class="badges">
+        ${p.env?`<span class="bd ${p.env}">${p.env==='CHAUD'?'Chaud':p.env==='TIEDE'?'Tiède':'Froid'}</span>`:''}
+        ${estArc?`<span class="bd ${p.motif==='refus'?'CHAUD':'gr'}">${p.motif==='refus'?'Refus':'Sans suite'}</span><span class="bd gr">${p.type==='filleul'?'Filleul':'Investisseur'}</span>`:''}
+        ${!estArc&&p.situation?`<span class="bd gr">${esc(p.situation)}</span>`:''}
+        ${!estArc&&p.age?`<span class="bd gr">${esc(p.age)} ans</span>`:''}
+        ${!estArc&&p.proprio==='oui'?'<span class="bd ok">propriétaire</span>':''}
+      </div>
+      ${estArc?`<div class="nxt">Archivé le ${fmtD(p.archDate)}</div><div class="acts" style="margin-top:9px"><button class="btn sm sec" data-restore="${p.id}" onclick="event.stopPropagation()">↩ Redéployer</button></div>`:`<div class="dots">${dots}</div>${r?`<div class="nxt ${st}">R${r.i+1} · ${fmtD(r.date)}${r.heure?' à '+r.heure:''}</div>`:''}`}
+    </div>`;
+  }).join('')+'</div>'
+  : (estArc
+      ? `<div class="empty"><div class="ic">🗂️</div>Aucune fiche archivée pour l'instant.</div>`
+      : `<div class="empty"><div class="ic">${estInv?'👤':'🤝'}</div>Aucune fiche ici pour l'instant.<br>Utilise le bouton « Ajouter » en haut à droite.</div>`);
+
+  majCompteurs();
+}
+
+/* ================= fiche ================= */
+function ouvrir(id){
+  fiche = data.find(p=>p.id===id);
+  if(!fiche) return;
+  rdvOpen=null;
+  $('#fAv').textContent = initials(fiche);
+  $('#fAv').className = 'av';
+  $('#fName').textContent = nomComplet(fiche);
+  majSousTitre();
+  majBoutonsArchive();
+  renderRdvs(); renderNotes(); renderForm(); renderMsgSel();
+  $('#fRdvEd').classList.remove('on');
+  $('#fSaved').textContent='';
+  go('fiche');
+}
+function majSousTitre(){
+  const t = [
+    fiche.type==='filleul'?'Filleul':'Investisseur',
+    fiche.archive? ('archivé — '+(fiche.motif==='refus'?'refus':'sans suite')) :
+      (fiche.env? (fiche.env==='CHAUD'?'relation chaude':fiche.env==='TIEDE'?'relation tiède':'relation froide'):''),
+    fiche.tel||'', mailDe(fiche)||''
+  ].filter(Boolean).join(' · ');
+  $('#fSub').textContent = t;
+}
+function majBoutonsArchive(){
+  const a = !!fiche.archive;
+  $('#fArchRefus').style.display = a?'none':'';
+  $('#fArchSuite').style.display = a?'none':'';
+  $('#fRestore').style.display = a?'':'none';
+  $('#fArchInfo').textContent = a
+    ? 'Archivée le '+fmtD(fiche.archDate)+' — motif : '+(fiche.motif==='refus'?'refus':'sans suite')+'.'
+    : '';
+}
+function renderRdvs(){
+  $('#fRdvs').innerHTML = Array.from({length:NB_RDV},(_,i)=>{
+    const r = rdvDe(fiche,i);
+    let cl='';
+    if(r.statut==='done') cl='done';
+    else if(r.statut==='annule') cl='';
+    else if(r.date) cl = etatDate(r.date)==='late'?'late':'plan';
+    const txt = r.statut==='annule' ? 'annulé'
+              : r.date ? fmtD(r.date)+(r.heure?' · '+r.heure:'')
+              : 'à planifier';
+    return `<div class="rdv ${cl}" data-rdv="${i}"><div class="t">R${i+1}</div><div class="d">${txt}</div></div>`;
+  }).join('');
+}
+function ouvrirRdv(i){
+  rdvOpen=i;
+  const r=rdvDe(fiche,i);
+  $('#edTitle').textContent = 'Rendez-vous R'+(i+1);
+  $('#edDate').value=r.date||''; $('#edHeure').value=r.heure||''; $('#edNote').value=r.note||'';
+  $$('#edSeg button').forEach(b=>b.classList.toggle('on', (b.dataset.st||'')===(r.statut||'')));
+  $('#fRdvEd').classList.add('on');
+  $('#fRdvEd').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderNotes(){
+  const L=(fiche.notes||[]).slice().sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+  $('#cmList').innerHTML = L.length ? L.map((n,ix)=>`
+    <div class="jr"><div class="d">${fmtLong(n.d)||fmtD(n.d)}</div><div class="t">${esc(n.t)}</div>
+    <button class="x" data-delnote="${esc(n.d)}|${ix}" title="Supprimer">✕</button></div>`).join('')
+    : '<div class="hint">Aucune note pour l\'instant.</div>';
+}
+function renderForm(){
+  $('#fForm').innerHTML = CHAMPS.map(([k,l,t])=>{
+    if(Array.isArray(t)){
+      const opts = t.map(v=>`<option value="${esc(v)}" ${fiche[k]===v?'selected':''}>${esc(v||'—')}</option>`).join('');
+      const extra = t.indexOf(fiche[k])<0 && fiche[k] ? `<option selected>${esc(fiche[k])}</option>` : '';
+      return `<div><label class="f">${l}</label><select data-c="${k}">${opts}${extra}</select></div>`;
+    }
+    return `<div><label class="f">${l}</label><input type="text" data-c="${k}" value="${esc(fiche[k]||'')}"></div>`;
+  }).join('');
+}
+
+/* ================= messages ================= */
+function remplir(txt,p){
+  const r = prochainRdv(p);
+  return String(txt||'')
+    .replace(/\{prenom\}/g, prenomDe(p)||'[prénom]')
+    .replace(/\{nom\}/g, p.nom||'')
+    .replace(/\{moi\}/g, cfg.prenom||'[ton prénom]')
+    .replace(/\{tel\}/g, cfg.tel||'')
+    .replace(/\{rdv\}/g, r? fmtLong(r.date)+(r.heure?' à '+r.heure:'') : '[date du rendez-vous]');
+}
+function renderMsgSel(){
+  $('#msgSel').innerHTML = '<option value="">— choisir un message —</option>'+
+    msgs.map(m=>`<option value="${m.id}">${esc(m.t)}${m.canal==='mail'?' (e-mail)':''}</option>`).join('');
+  $('#msgBody').value=''; $('#msgSubj').value=''; $('#msgCnt').textContent='';
+  const t=telNorm(fiche), m=mailDe(fiche);
+  $('#msgHint').innerHTML = 'Rien ne part tout seul : le bouton ouvre ton application avec le texte prérempli, tu valides l\'envoi.<br>'+
+    (t?`Numéro : <strong>${esc(t)}</strong>. `:'<span style="color:var(--hot)">Aucun numéro sur cette fiche. </span>')+
+    (m?`E-mail : <strong>${esc(m)}</strong>.`:'<span style="color:var(--hot)">Aucune adresse e-mail.</span>');
+}
+function renderMessages(){
+  const L = data.filter(p=>!p.archive).sort((a,b)=>norm(nomComplet(a)).localeCompare(norm(nomComplet(b))));
+  const keep=$('#mSample').value;
+  $('#mSample').innerHTML = '<option value="">Contact fictif (Marie Dupont)</option>'+
+    L.slice(0,150).map(p=>`<option value="${p.id}" ${p.id===keep?'selected':''}>${esc(nomComplet(p))}</option>`).join('');
+  const ex = data.find(p=>p.id===$('#mSample').value) || {prenom:'Marie', nom:'Dupont', rdv:[{date:today(),heure:'14:00',statut:'plan'}]};
+  $('#msgList').innerHTML = msgs.map(m=>{
+    const apercu = remplir(m.v, ex), n = apercu.length;
+    const ed = editMsg===m.id;
+    return `<div class="mcard">
+      <div class="h">
+        <div class="t">${ed?`<input type="text" data-mt="${m.id}" value="${esc(m.t)}" style="max-width:320px">`:esc(m.t)}</div>
+        <span class="bd gr">${m.canal==='mail'?'E-mail':'SMS / WhatsApp'}</span>
+        <button class="btn sm sec" data-medit="${m.id}">${ed?'Terminer':'Modifier'}</button>
+        <button class="btn sm danger" data-mdel="${m.id}">Supprimer</button>
+      </div>
+      <div class="b">
+        <div>
+          ${ed?`<label class="f">Canal</label>
+            <select data-mc="${m.id}" style="margin-bottom:12px">
+              <option value="sms" ${m.canal==='sms'?'selected':''}>SMS / WhatsApp</option>
+              <option value="mail" ${m.canal==='mail'?'selected':''}>E-mail</option>
+            </select>`:''}
+          ${m.canal==='mail'?`<label class="f">Objet</label><input type="text" data-mo="${m.id}" value="${esc(m.objet||'')}" style="margin-bottom:12px" ${ed?'':'readonly'}>`:''}
+          <label class="f">Texte</label>
+          <textarea data-mv="${m.id}" style="min-height:150px">${esc(m.v)}</textarea>
+          <div>${VARS.map(v=>`<span class="vch" data-ins="${m.id}" data-v="${v}">${v}</span>`).join('')}</div>
+        </div>
+        <div>
+          <label class="f">Aperçu</label>
+          <div class="bub">${esc(apercu)||'(vide)'}</div>
+          <div class="cnt">${n} caractères${m.canal==='sms'?' · '+(n<=160?1:Math.ceil(n/153))+' SMS':''}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty"><div class="ic">✍️</div>Aucun message enregistré.</div>';
+}
+
+/* ================= réglages ================= */
+function renderReglages(){
+  $('#cPrenom').value=cfg.prenom||''; $('#cTel').value=cfg.tel||''; $('#cSig').value=cfg.sig||'';
+  $('#sUrl').value=sync.url||''; $('#sTok').value=sync.token||''; $('#sAuto').checked=!!sync.auto;
+  if(!$('#sEtat').textContent) etatSync(sync.url?'Prêt.':'Pas encore configuré.', false);
+  $('#logoPrev').innerHTML = logo ? `<img src="${logo}" style="max-height:60px;max-width:200px;object-fit:contain">`
+    : '<span class="hint" style="margin:0">Aucun logo</span>';
+  const inv=data.filter(p=>p.type==='investisseur').length, fil=data.filter(p=>p.type==='filleul').length;
+  const notes=data.reduce((s,p)=>s+(p.notes||[]).length,0);
+  const rdv=data.reduce((s,p)=>s+(p.rdv||[]).filter(r=>r&&r.date).length,0);
+  $('#stStats').textContent = `${inv} investisseurs · ${fil} filleuls · ${rdv} rendez-vous datés · ${notes} notes · ${msgs.length} modèles de message.`;
+}
+
+/* ================= synchronisation ================= */
+function etatSync(txt, err){
+  const e=$('#sEtat'); if(!e) return;
+  e.innerHTML = (err?'<span style="color:var(--hot)">':'<span>')+esc(txt)+'</span>'+
+    (sync.last?'<br>Dernière synchronisation : '+esc(sync.last):'');
+}
+function appel(payload){
+  // POST en text/plain : évite la requête préalable CORS que Apps Script refuse.
+  return fetch(sync.url, {
+    method:'POST', redirect:'follow',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(payload)
+  }).then(r=>r.text()).then(t=>{
+    let j; try{ j=JSON.parse(t); }
+    catch(e){ throw new Error("Réponse illisible. Vérifie que le déploiement est accessible à « Tout le monde »."); }
+    if(!j.ok) throw new Error(j.erreur||'Erreur inconnue du script');
+    return j;
+  });
+}
+function fusionner(distantes){
+  const idx={}; data.forEach(p=>idx[p.id]=p);
+  const sup={}; dels.forEach(d=>sup[d.id]=d.maj);
+  let ajout=0, maj=0;
+  distantes.forEach(r=>{
+    if(!r||!r.id) return;
+    if(sup[r.id] && sup[r.id] >= (r.maj||'')) return;  // supprimée ici après coup
+    r.rdv=r.rdv||[]; r.notes=r.notes||[];
+    const loc=idx[r.id];
+    if(!loc){ data.push(r); ajout++; }
+    else if((r.maj||'') > (loc.maj||'')){ Object.assign(loc, r); maj++; }
+  });
+  return {ajout, maj};
+}
+function synchroniser(silencieux){
+  if(enCours) return Promise.resolve();
+  if(!sync.url || !sync.token){
+    if(!silencieux) toast('Renseigne d\'abord l\'adresse et le jeton dans Réglages.');
+    return Promise.resolve();
+  }
+  enCours=true;
+  $('#btnSync').textContent='…';
+  if(!silencieux) toast('Synchronisation en cours…');
+  const aSupprimer = dels.map(d=>d.id);
+  return appel({action:'push', token:sync.token, fiches:data, supprimes:aSupprimer})
+    .then(j=>{
+      const f = fusionner(j.fiches||[]);
+      dels=[]; saveDels(); save();
+      sync.last = new Date().toLocaleString('fr-FR'); saveSync();
+      const msg = 'Sheet : '+(j.ajoutees||0)+' lignes ajoutées, '+(j.majs||0)+' mises à jour'
+        + (j.supprimees?', '+j.supprimees+' supprimées':'')
+        + '. Ici : '+f.ajout+' fiches récupérées, '+f.maj+' actualisées.';
+      etatSync(msg,false);
+      if(!silencieux) toast('Synchronisation terminée.');
+      if(vue==='investisseurs'||vue==='filleuls') renderListe();
+      if(vue==='accueil') renderAccueil();
+      if(vue==='reglages') renderReglages();
+      if(vue==='fiche' && fiche){ const f2=data.find(p=>p.id===fiche.id); if(f2){ fiche=f2; renderRdvs(); renderNotes(); renderForm(); } }
+    })
+    .catch(e=>{
+      etatSync('Échec : '+e.message, true);
+      if(!silencieux) toast('Échec : '+e.message);
+    })
+    .then(()=>{ enCours=false; $('#btnSync').textContent='⟳'; });
+}
+
+/* ================= export ================= */
+function exportXlsx(){
+  if(typeof XLSX==='undefined'){ toast('Module Excel indisponible (connexion internet ?).'); return; }
+  const lignes = data.map(p=>{
+    const o={
+      'Type': p.type==='filleul'?'Filleul':'Investisseur',
+      'Prénom':p.prenom,'Nom':p.nom,'Téléphone':p.tel,'E-mail':p.email,
+      'Relation':p.env,'Géographie':p.geo,'Situation':p.situation,'Âge':p.age,
+      'Enfants':p.enfants,'Propriétaire':p.proprio,'En activité':p.activite,
+      'Qualifié':p.qualifie,'Pertinent':p.pertinent
+    };
+    for(let i=0;i<NB_RDV;i++){
+      const r=rdvDe(p,i);
+      o['R'+(i+1)+' date']=r.date||'';
+      o['R'+(i+1)+' statut']=r.statut||'';
+    }
+    o['Dernière note']=(p.notes||[]).slice(-1).map(n=>n.t).join('');
+    return o;
+  });
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(lignes.filter(l=>l.Type==='Investisseur')), 'Investisseurs');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(lignes.filter(l=>l.Type==='Filleul')), 'Filleuls');
+  XLSX.writeFile(wb, 'prodemial-'+today()+'.xlsx');
+  toast('Fichier Excel téléchargé.');
+}
+
+/* ================= événements ================= */
+document.addEventListener('click', ev=>{
+  const t=ev.target;
+
+  const nav = t.closest('[data-go]');
+  if(nav){ go(nav.dataset.go); return; }
+
+  const op = t.closest('[data-open]');
+  if(op){ ouvrir(op.dataset.open); return; }
+
+  const re = t.closest('[data-restore]');
+  if(re){
+    const p = data.find(x=>x.id===re.dataset.restore);
+    if(p){
+      if(confirm('Restaurer '+nomComplet(p)+' dans les '+(p.type==='filleul'?'filleuls':'investisseurs')+' ?')){
+        p.archive=false; p.motif=''; p.archDate='';
+        p.notes.push({d:today(), t:'Fiche restaurée depuis l\'archive.'});
+        touch(p); save(); renderListe(); renderAccueil(); toast('Fiche restaurée.');
+      }
+    }
+    return;
+  }
+
+  const ch = t.closest('[data-ch]');
+  if(ch){ filtre = (filtre===ch.dataset.ch)?'':ch.dataset.ch; renderListe(); return; }
+
+  const rd = t.closest('[data-rdv]');
+  if(rd){ ouvrirRdv(Number(rd.dataset.rdv)); return; }
+
+  if(t.dataset.st!==undefined && t.closest('#edSeg')){
+    $$('#edSeg button').forEach(b=>b.classList.remove('on'));
+    t.classList.add('on');
+    return;
+  }
+  if(t.dataset.delnote!==undefined){
+    const ix = Number(t.dataset.delnote.split('|')[1]);
+    const L=(fiche.notes||[]).slice().sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+    const cible=L[ix];
+    fiche.notes = fiche.notes.filter(n=>n!==cible);
+    touch(fiche); save(); renderNotes(); toast('Note supprimée.');
+    return;
+  }
+  if(t.dataset.medit){
+    editMsg = (editMsg===t.dataset.medit)?null:t.dataset.medit;
+    renderMessages(); return;
+  }
+  if(t.dataset.mdel){
+    const m=msgs.find(x=>x.id===t.dataset.mdel);
+    if(!confirm('Supprimer le message « '+m.t+' » ?')) return;
+    msgs = msgs.filter(x=>x.id!==t.dataset.mdel); saveMsg(); renderMessages(); toast('Message supprimé.');
+    return;
+  }
+  if(t.dataset.ins){
+    const ta=document.querySelector(`textarea[data-mv="${t.dataset.ins}"]`);
+    const s=ta.selectionStart??ta.value.length, e=ta.selectionEnd??ta.value.length;
+    ta.value=ta.value.slice(0,s)+t.dataset.v+ta.value.slice(e);
+    const m=msgs.find(x=>x.id===t.dataset.ins); m.v=ta.value; saveMsg(); renderMessages();
+    return;
+  }
+});
+
+/* --- liste --- */
+$('#q').addEventListener('input', renderListe);
+$('#sortBy').addEventListener('change', renderListe);
+$('#btnXls').onclick = exportXlsx;
+$('#btnAdd').onclick = ()=>{ $('#addBox').classList.toggle('on'); if($('#addBox').classList.contains('on')) $('#aPrenom').focus(); };
+$('#aCancel').onclick = ()=>$('#addBox').classList.remove('on');
+$('#qAdd').onclick = ()=>{ go('investisseurs'); $('#addBox').classList.add('on'); $('#aPrenom').focus(); };
+$('#aSave').onclick = ()=>{
+  const p = nouveau(typeCur);
+  p.prenom=$('#aPrenom').value.trim(); p.nom=$('#aNom').value.trim();
+  if(!p.nom && !p.prenom){ toast('Indique au moins un nom ou un prénom.'); return; }
+  p.tel=$('#aTel').value.trim(); p.email=$('#aMail').value.trim();
+  p.env=$('#aEnv').value; p.geo=$('#aGeo').value; p.situation=$('#aSit').value;
+  p.age=$('#aAge').value; p.enfants=$('#aEnf').value; p.proprio=$('#aProp').value; p.activite=$('#aAct').value;
+  const c=$('#aCom').value.trim();
+  if(c) p.notes.push({d:today(), t:c});
+  data.unshift(p); save();
+  ['aPrenom','aNom','aTel','aMail','aCom'].forEach(id=>$('#'+id).value='');
+  ['aEnv','aGeo','aSit','aAge','aEnf','aProp','aAct'].forEach(id=>$('#'+id).value='');
+  $('#addBox').classList.remove('on');
+  renderListe(); toast('Fiche créée.');
+  ouvrir(p.id);
+};
+
+/* --- fiche --- */
+$('#fBack').onclick = ()=>go(!fiche?'investisseurs':(fiche.archive?'archive':(fiche.type==='filleul'?'filleuls':'investisseurs')));
+$('#edClose').onclick = ()=>$('#fRdvEd').classList.remove('on');
+$('#edSave').onclick = ()=>{
+  if(rdvOpen===null) return;
+  const st = ($('#edSeg .on')||{dataset:{}}).dataset.st||'';
+  const r = {date:$('#edDate').value, heure:$('#edHeure').value, statut:st, note:$('#edNote').value.trim()};
+  if(r.date && !r.statut) r.statut='plan';
+  while(fiche.rdv.length<=rdvOpen) fiche.rdv.push({date:'',heure:'',statut:'',note:''});
+  const avant = fiche.rdv[rdvOpen];
+  fiche.rdv[rdvOpen]=r;
+  if(r.statut==='done' && (!avant||avant.statut!=='done'))
+    fiche.notes.push({d:r.date||today(), t:'R'+(rdvOpen+1)+' réalisé.'+(r.note?' '+r.note:'')});
+  touch(fiche); save(); renderRdvs(); renderNotes(); $('#fRdvEd').classList.remove('on'); toast('Rendez-vous enregistré.');
+};
+$('#cmAdd').onclick = ()=>{
+  const v=$('#cmNew').value.trim();
+  if(!v) return;
+  fiche.notes.push({d:today(), t:v});
+  $('#cmNew').value=''; touch(fiche); save(); renderNotes(); toast('Note ajoutée.');
+};
+$('#fSave').onclick = ()=>{
+  $$('#fForm [data-c]').forEach(i=> fiche[i.dataset.c]=i.value.trim());
+  touch(fiche); save();
+  $('#fName').textContent=nomComplet(fiche);
+  $('#fAv').textContent=initials(fiche);
+  majSousTitre(); renderMsgSel();
+  $('#fSaved').textContent='Enregistré.';
+  toast('Fiche enregistrée.');
+};
+$('#fMove').onclick = ()=>{
+  const dest = fiche.type==='investisseur'?'filleul':'investisseur';
+  if(!confirm('Déplacer '+nomComplet(fiche)+' vers les '+(dest==='filleul'?'filleuls':'investisseurs')+' ?')) return;
+  fiche.type=dest;
+  fiche.notes.push({d:today(), t:'Fiche déplacée vers les '+(dest==='filleul'?'filleuls':'investisseurs')+'.'});
+  touch(fiche); save(); majSousTitre(); renderNotes(); toast('Fiche déplacée.');
+};
+function archiver(motif, libelle){
+  if(!confirm('Archiver '+nomComplet(fiche)+' — motif : '+libelle+' ?')) return;
+  fiche.archive=true; fiche.motif=motif; fiche.archDate=today();
+  fiche.notes.push({d:today(), t:'Fiche archivée — motif : '+libelle+'.'});
+  touch(fiche); save(); majSousTitre(); majBoutonsArchive(); renderNotes(); renderAccueil();
+  toast('Fiche archivée.');
+}
+$('#fArchRefus').onclick = ()=>archiver('refus','refus');
+$('#fArchSuite').onclick = ()=>archiver('suite','sans suite');
+$('#fRestore').onclick = ()=>{
+  if(!confirm('Restaurer '+nomComplet(fiche)+' dans les '+(fiche.type==='filleul'?'filleuls':'investisseurs')+' ?')) return;
+  fiche.archive=false; fiche.motif=''; fiche.archDate='';
+  fiche.notes.push({d:today(), t:'Fiche restaurée depuis l\'archive.'});
+  touch(fiche); save(); majSousTitre(); majBoutonsArchive(); renderNotes(); renderAccueil();
+  toast('Fiche restaurée.');
+};
+$('#fDel').onclick = ()=>{
+  if(!confirm('Supprimer définitivement '+nomComplet(fiche)+' ? Cette action est irréversible.')) return;
+  dels.push({id:fiche.id, maj:new Date().toISOString()}); saveDels();
+  const dest = fiche.archive?'archive':(fiche.type==='filleul'?'filleuls':'investisseurs');
+  data = data.filter(p=>p.id!==fiche.id); save();
+  go(dest);
+  toast('Fiche supprimée.');
+};
+
+/* --- messages depuis la fiche --- */
+$('#msgSel').onchange = ()=>{
+  const m = msgs.find(x=>x.id===$('#msgSel').value);
+  if(!m){ $('#msgBody').value=''; $('#msgSubj').value=''; $('#msgCnt').textContent=''; return; }
+  $('#msgBody').value = remplir(m.v, fiche);
+  $('#msgSubj').value = remplir(m.objet||m.t, fiche);
+  $('#msgSubjW').style.display = m.canal==='mail' ? '' : 'none';
+  majCompte();
+};
+function majCompte(){
+  const n=$('#msgBody').value.length;
+  $('#msgCnt').textContent = n+' caractères · '+(n<=160?1:Math.ceil(n/153))+' SMS';
+}
+$('#msgBody').addEventListener('input', majCompte);
+function journaliser(canal){
+  if(!$('#mLog').checked) return;
+  fiche.notes.push({d:today(), t:'Message envoyé par '+canal+'.'});
+  touch(fiche); save(); renderNotes();
+}
+$('#mSms').onclick = ()=>{
+  const b=$('#msgBody').value.trim(); if(!b) return toast('Le message est vide.');
+  const t=telNorm(fiche); if(!t) return toast('Aucun numéro sur cette fiche.');
+  location.href='sms:'+t+'?&body='+encodeURIComponent(b); journaliser('SMS');
+};
+$('#mWa').onclick = ()=>{
+  const b=$('#msgBody').value.trim(); if(!b) return toast('Le message est vide.');
+  const t=telNorm(fiche).replace(/^\+/,''); if(!t) return toast('Aucun numéro sur cette fiche.');
+  window.open('https://wa.me/'+t+'?text='+encodeURIComponent(b),'_blank'); journaliser('WhatsApp');
+};
+$('#mMail').onclick = ()=>{
+  const b=$('#msgBody').value.trim(); if(!b) return toast('Le message est vide.');
+  const m=mailDe(fiche); if(!m) return toast('Aucune adresse e-mail sur cette fiche.');
+  const full = b + (cfg.sig?'\n\n'+cfg.sig:'');
+  location.href='mailto:'+encodeURIComponent(m)+'?subject='+encodeURIComponent($('#msgSubj').value||'')+'&body='+encodeURIComponent(full);
+  journaliser('e-mail');
+};
+$('#mCopy').onclick = ()=>{
+  const b=$('#msgBody').value.trim(); if(!b) return;
+  (navigator.clipboard?navigator.clipboard.writeText(b):Promise.reject())
+    .then(()=>toast('Message copié.'),()=>{ $('#msgBody').select(); document.execCommand('copy'); toast('Message copié.'); });
+};
+
+/* --- onglet messages --- */
+$('#mSample').onchange = renderMessages;
+$('#btnNewMsg').onclick = ()=>{
+  const m={id:'m'+Date.now().toString(36), t:'Nouveau message', canal:'sms', objet:'', v:"Bonjour {prenom}, "};
+  msgs.unshift(m); saveMsg(); editMsg=m.id; renderMessages();
+  toast('Message créé, personnalise-le.');
+};
+$('#msgList').addEventListener('input', ev=>{
+  const t=ev.target, m = msgs.find(x=>x.id===(t.dataset.mv||t.dataset.mt||t.dataset.mo));
+  if(!m) return;
+  if(t.dataset.mv) m.v=t.value;
+  if(t.dataset.mt) m.t=t.value;
+  if(t.dataset.mo) m.objet=t.value;
+  saveMsg();
+  clearTimeout($('#msgList').k);
+  $('#msgList').k = setTimeout(()=>{ const f=document.activeElement; if(!f||f.tagName!=='TEXTAREA') renderMessages(); }, 900);
+});
+$('#msgList').addEventListener('change', ev=>{
+  if(!ev.target.dataset.mc) return;
+  const m=msgs.find(x=>x.id===ev.target.dataset.mc);
+  m.canal=ev.target.value; saveMsg(); renderMessages();
+});
+
+/* --- réglages --- */
+$('#btnSync').onclick = ()=>synchroniser(false);
+$('#sNow').onclick = ()=>synchroniser(false);
+$('#sSave').onclick = ()=>{
+  sync.url=$('#sUrl').value.trim(); sync.token=$('#sTok').value.trim(); sync.auto=$('#sAuto').checked;
+  saveSync(); toast('Paramètres de synchronisation enregistrés.'); etatSync(sync.url?'Prêt.':'Adresse manquante.', !sync.url);
+};
+$('#sTest').onclick = ()=>{
+  const u=$('#sUrl').value.trim(), t=$('#sTok').value.trim();
+  if(!u||!t) return toast('Adresse et jeton obligatoires.');
+  etatSync('Test en cours…', false);
+  fetch(u+(u.includes('?')?'&':'?')+'action=ping&token='+encodeURIComponent(t), {redirect:'follow'})
+    .then(r=>r.text()).then(x=>{
+      let j; try{ j=JSON.parse(x); }catch(e){ throw new Error("Réponse illisible : le déploiement doit être accessible à « Tout le monde »."); }
+      if(!j.ok) throw new Error(j.erreur||'Refus du script');
+      etatSync('Connexion établie. Tu peux synchroniser.', false); toast('Connexion établie.');
+    })
+    .catch(e=>{ etatSync('Échec : '+e.message, true); toast('Échec du test.'); });
+};
+$('#cSave').onclick = ()=>{
+  cfg={prenom:$('#cPrenom').value.trim(), tel:$('#cTel').value.trim(), sig:$('#cSig').value};
+  saveCfg(); toast('Réglages enregistrés.'); renderAccueil();
+};
+$('#logoBtn').onclick = ()=>$('#logoFile').click();
+$('#logoFile').onchange = e=>{
+  const f=e.target.files[0]; if(!f) return;
+  if(f.size>900000){ toast('Image trop lourde : choisis un fichier sous 900 ko.'); e.target.value=''; return; }
+  const r=new FileReader();
+  r.onload=ev=>{ logo=ev.target.result; try{ set(K.l,logo); }catch(x){ toast('Logo trop lourd pour être mémorisé.'); }
+    renderReglages(); renderAccueil(); toast('Logo enregistré.'); };
+  r.readAsDataURL(f); e.target.value='';
+};
+$('#logoDel').onclick = ()=>{ logo=''; set(K.l,''); renderReglages(); renderAccueil(); toast('Logo retiré.'); };
+$('#bXls').onclick = exportXlsx;
+$('#bExport').onclick = ()=>{
+  const blob=new Blob([JSON.stringify({app:'prodemial', date:new Date().toISOString(), data, cfg, msgs}, null, 2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='sauvegarde-prodemial-'+today()+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  toast('Sauvegarde téléchargée.');
+};
+$('#bImportBtn').onclick = ()=>$('#bImport').click();
+$('#bImport').onchange = e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(!Array.isArray(d.data)) throw 0;
+      if(!confirm('Restaurer '+d.data.length+' fiches ? Les données actuelles seront remplacées.')) return;
+      data=d.data; if(d.cfg) cfg=d.cfg; if(Array.isArray(d.msgs)) msgs=d.msgs;
+      data.forEach(p=>{ p.rdv=p.rdv||[]; p.notes=p.notes||[]; if(!p.type) p.type='investisseur'; if(p.motif===undefined) p.motif=''; if(p.archDate===undefined) p.archDate=''; });
+      save(); saveCfg(); saveMsg(); renderReglages(); renderAccueil();
+      toast('Sauvegarde restaurée.');
+    }catch(x){ alert("Fichier illisible : ce n'est pas une sauvegarde de cette application."); }
+  };
+  r.readAsText(f); e.target.value='';
+};
+
+/* ================= démarrage ================= */
+renderAccueil();
+go('accueil');
+if(sync.url && sync.token && sync.auto){
+  setTimeout(()=>synchroniser(true), 2500);
+  setInterval(()=>{ if(!document.hidden) synchroniser(true); }, 300000);
+}
+
+})();
+</script>
+</body>
+</html>
