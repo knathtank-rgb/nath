@@ -235,9 +235,33 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
   .tabbar .tb .d{position:absolute;top:2px;right:14%;min-width:16px;height:16px;font-size:10px;line-height:16px;padding:0 4px;border-radius:999px;background:var(--hot);color:#fff}
   .tabbar .tb .d:empty{display:none}
 }
+.lockscr{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(130deg,var(--navy) 0%,var(--ocean) 48%,var(--teal) 100%);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.lockcard{background:#fff;border-radius:22px;padding:36px 30px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.lockLogo{width:64px;height:64px;border-radius:16px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:var(--foam);overflow:hidden}
+.lockLogo img{width:100%;height:100%;object-fit:contain}
+.lockLogo .mk{font-size:28px;color:var(--ocean)}
+.locktitle{font-family:'Outfit';font-size:20px;font-weight:700;color:var(--ink)}
+.locksub{font-size:13px;color:var(--muted);margin:6px 0 18px}
+.pindots{text-align:center;font-size:26px;letter-spacing:14px;padding:12px 10px 12px 22px}
+.lockerr{color:#C0392B;font-size:12.5px;margin-top:10px;min-height:16px}
 </style>
 </head>
 <body>
+
+<div id="lockScreen" class="lockscr" style="display:none">
+  <div class="lockcard">
+    <div class="lockLogo" id="lockLogo"><span class="mk">◆</span></div>
+    <div class="locktitle">Prodemial</div>
+    <div class="locksub">Entre ton code d'accès</div>
+    <input type="password" id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" class="pindots" placeholder="••••">
+    <button class="btn" id="pinUnlock" style="width:100%;margin-top:14px">Déverrouiller</button>
+    <div class="lockerr" id="lockErr"></div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-in">
@@ -451,9 +475,15 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
   <div class="sec-h"><h2>Réglages</h2><span class="s">Logo, identité, sauvegardes</span></div>
 
   <div class="blk">
-    <h3>Installer sur ton téléphone</h3>
-    <div class="s">Un signet plein écran, avec son icône — pas une vraie application, mais ça s'ouvre et se referme comme une.</div>
+    <h3>Installer comme application</h3>
+    <div class="s">S'installe comme une vraie application — icône, fenêtre dédiée sans barre d'adresse, pas juste un signet.</div>
     <div class="install">
+      <div class="plat">💻 Ordinateur (Chrome / Edge)</div>
+      <ol>
+        <li>Ouvre <strong>https://prodemial-nat.netlify.app</strong>.</li>
+        <li>Clique sur l'icône d'installation <strong>⊕</strong> dans la barre d'adresse (ou menu <strong>⋮</strong> → « Installer Prodemial… »).</li>
+        <li>Valide. Une fenêtre dédiée s'ouvre et une icône est créée sur le Bureau / dans le menu démarrer.</li>
+      </ol>
       <div class="plat">📱 iPhone (Safari)</div>
       <ol>
         <li>Ouvre cette page dans <strong>Safari</strong> (pas Chrome).</li>
@@ -470,6 +500,21 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
       </ol>
     </div>
     <div class="hint">Les données restent propres à chaque appareil — pense à synchroniser (⟳) après avoir travaillé ailleurs.</div>
+  </div>
+
+  <div class="blk">
+    <h3>Code d'accès</h3>
+    <div class="s">Demandé à chaque ouverture de l'app sur cet appareil.</div>
+    <div class="fg">
+      <div><label class="f">Nouveau code (4 chiffres)</label><input type="password" id="pinNew" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••"></div>
+      <div><label class="f">Confirmer</label><input type="password" id="pinConfirm" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••"></div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="pinSave">Enregistrer le code</button>
+      <button class="btn sec" id="pinRemove">Retirer le code</button>
+      <button class="btn dark" id="pinLockNow">🔒 Verrouiller maintenant</button>
+    </div>
+    <div class="hint" id="pinEtat"></div>
   </div>
 
   <div class="blk">
@@ -762,7 +807,7 @@ const MSG_DEF = [
 const VARS = ['{prenom}','{nom}','{moi}','{tel}','{rdv}'];
 
 /* ================= stockage ================= */
-const K = {d:'pdm3_data', c:'pdm3_cfg', m:'pdm3_msg', l:'pdm3_logo', s:'pdm3_sync', x:'pdm3_dels'};
+const K = {d:'pdm3_data', c:'pdm3_cfg', m:'pdm3_msg', l:'pdm3_logo', s:'pdm3_sync', x:'pdm3_dels', p:'pdm3_pin'};
 const memo = {};
 const get = k => { try{ return localStorage.getItem(k); }catch(e){ return memo[k]??null; } };
 const set = (k,v) => { try{ localStorage.setItem(k,v); }catch(e){ memo[k]=v; } };
@@ -936,6 +981,7 @@ function renderAccueil(){
 
   majCompteurs();
   $('#navLogo').innerHTML = logo ? `<img src="${logo}" alt="">` : '<span class="mk">◆</span>';
+  const lockLogoEl = $('#lockLogo'); if(lockLogoEl) lockLogoEl.innerHTML = logo ? `<img src="${logo}" alt="">` : '<span class="mk">◆</span>';
 }
 function majCompteurs(){
   const nInv = data.filter(p=>p.type==='investisseur'&&!p.archive).length;
@@ -1554,9 +1600,48 @@ $('#bImport').onchange = e=>{
   r.readAsText(f); e.target.value='';
 };
 
+/* ================= code d'accès ================= */
+function pinEl(){ return $('#lockScreen'); }
+function verrouiller(){
+  if(get(K.p)){
+    pinEl().style.display = 'flex';
+    const inp = $('#pinInput'); inp.value=''; $('#lockErr').textContent='';
+    setTimeout(()=>inp.focus(), 50);
+  }
+}
+function deverrouiller(){
+  const saisi = $('#pinInput').value.trim();
+  if(saisi && saisi === get(K.p)){
+    pinEl().style.display = 'none';
+  } else {
+    $('#lockErr').textContent = 'Code incorrect.';
+    $('#pinInput').value=''; $('#pinInput').focus();
+  }
+}
+$('#pinUnlock').onclick = deverrouiller;
+$('#pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') deverrouiller(); });
+$('#pinSave').onclick = ()=>{
+  const a = $('#pinNew').value.trim(), b = $('#pinConfirm').value.trim();
+  if(!/^\d{4}$/.test(a)){ $('#pinEtat').textContent = 'Le code doit faire exactement 4 chiffres.'; return; }
+  if(a !== b){ $('#pinEtat').textContent = 'Les deux codes ne correspondent pas.'; return; }
+  set(K.p, a); $('#pinNew').value=''; $('#pinConfirm').value='';
+  $('#pinEtat').textContent = 'Code enregistré. Il sera demandé à la prochaine ouverture.';
+  toast('Code d\'accès enregistré.');
+};
+$('#pinRemove').onclick = ()=>{
+  if(!get(K.p)){ $('#pinEtat').textContent = 'Aucun code actif.'; return; }
+  if(!confirm('Retirer le code d\'accès ? L\'app s\'ouvrira sans demander de code.')) return;
+  set(K.p, ''); $('#pinEtat').textContent = 'Code retiré.'; toast('Code d\'accès retiré.');
+};
+$('#pinLockNow').onclick = ()=>{
+  if(!get(K.p)){ $('#pinEtat').textContent = 'Définis d\'abord un code ci-dessus.'; return; }
+  verrouiller();
+};
+
 /* ================= démarrage ================= */
 renderAccueil();
 go('accueil');
+verrouiller();
 if(sync.url && sync.token && sync.auto){
   setTimeout(()=>synchroniser(true), 2500);
   setInterval(()=>{ if(!document.hidden) synchroniser(true); }, 300000);
