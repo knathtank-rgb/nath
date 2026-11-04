@@ -1,7 +1,4 @@
 // Service worker minimal — requis par Chrome pour proposer "Installer l'application".
-// Ne met rien en cache : chaque ouverture recharge la version la plus récente.
+// N'intercepte rien et ne met rien en cache : chaque requête part directement au réseau.
 self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => self.clients.claim());
-self.addEventListener('fetch', e => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-});
