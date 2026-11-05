@@ -901,7 +901,7 @@ function seed(){
     return p;
   }).filter(p=>p.nom||p.prenom);
 }
-if(!data){ data = seed(); save(); }
+if(!data){ data = []; save(); }
 data.forEach(p=>{ p.rdv=p.rdv||[]; p.notes=p.notes||[]; if(!p.type) p.type='investisseur'; if(!p.maj) p.maj=new Date(2020,0,1).toISOString(); if(p.motif===undefined) p.motif=''; if(p.archDate===undefined) p.archDate=''; });
 
 /* ================= rendez-vous ================= */
