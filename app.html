@@ -1293,7 +1293,7 @@ function synchroniser(silencieux){
         + '. Ici : '+f.ajout+' fiches récupérées, '+f.maj+' actualisées.';
       etatSync(msg,false);
       if(!silencieux) toast('Synchronisation terminée.');
-      if(vue==='investisseurs'||vue==='filleuls') renderListe();
+      if(vue==='investisseurs'||vue==='filleuls'||vue==='archive') renderListe();
       if(vue==='accueil') renderAccueil();
       if(vue==='reglages') renderReglages();
       if(vue==='fiche' && fiche){ const f2=data.find(p=>p.id===fiche.id); if(f2){ fiche=f2; renderRdvs(); renderNotes(); renderForm(); } }
