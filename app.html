@@ -105,6 +105,10 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
 .pcard:hover{transform:translateY(-2px);border-color:var(--teal2);box-shadow:0 4px 8px rgba(7,38,61,.06),0 16px 36px rgba(7,38,61,.1)}
 .pcard .top{display:flex;gap:12px;align-items:center}
 .av{width:46px;height:46px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit';font-weight:600;font-size:16px}
+.star{margin-left:auto;flex:none;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--line2);padding:2px}
+.star.on{color:#E0A526}
+.star-fiche{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);border-radius:11px;font-size:13.5px;font-weight:600;padding:8px 14px;cursor:pointer;color:#fff;margin-right:10px}
+.star-fiche.on{background:#E0A526;border-color:#E0A526;color:#2b2206}
 .av.CHAUD{background:linear-gradient(135deg,#E07B57,#C9512F)}
 .av.TIEDE{background:linear-gradient(135deg,#E0B05C,#C28A2C)}
 .av.FROID{background:linear-gradient(135deg,#2E8FB5,#13678F)}
@@ -380,6 +384,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
         <div class="s" id="fSub"></div>
       </div>
       <div class="sp"></div>
+      <button class="star-fiche" id="fStar">☆ Qualifié</button>
       <button class="back" id="fBack">‹ Retour</button>
     </div>
   </div>
@@ -824,6 +829,7 @@ let sync = Object.assign({url:SYNC_URL_DEFAUT, token:SYNC_TOKEN_DEFAUT, auto:tru
 let dels = rj(K.x, []);
 
 let vue='accueil', typeCur='investisseur', fiche=null, filtre='', rdvOpen=null, editMsg=null;
+let retourFiltre='', retourScroll=0;
 let enCours=false;
 
 /* ================= utilitaires ================= */
@@ -1013,6 +1019,7 @@ function filtrer(){
       return true;
     }
     if(filtre==='CHAUD'||filtre==='TIEDE'||filtre==='FROID') return p.env===filtre;
+    if(filtre==='qualifie') return p.qualifie==='OUI';
     if(filtre==='rdv') return !!prochainRdv(p);
     if(filtre==='late'){ const r=prochainRdv(p); return r && etatDate(r.date)==='late'; }
     if(filtre==='sans') return !prochainRdv(p) && nbFaits(p)===0;
@@ -1029,6 +1036,15 @@ function filtrer(){
     return norm(nomComplet(a)).localeCompare(norm(nomComplet(b)));
   });
   return L;
+}
+function basculerQualifie(id){
+  const p = data.find(x=>x.id===id);
+  if(!p) return;
+  p.qualifie = p.qualifie==='OUI' ? '' : 'OUI';
+  touch(p); save();
+  if(vue==='investisseurs'||vue==='filleuls'||vue==='archive') renderListe();
+  if(vue==='fiche' && fiche && fiche.id===id){ majSousTitre(); renderForm(); majStarFiche(); }
+  if(vue==='accueil') renderAccueil();
 }
 function renderListe(){
   const estInv = typeCur==='investisseur';
@@ -1056,6 +1072,7 @@ function renderListe(){
     ['CHAUD','Chauds',n(p=>p.env==='CHAUD')],
     ['TIEDE','Tièdes',n(p=>p.env==='TIEDE')],
     ['FROID','Froids',n(p=>p.env==='FROID')],
+    ['qualifie','★ Qualifiés',n(p=>p.qualifie==='OUI')],
     ['rdv','Avec rendez-vous',n(p=>!!prochainRdv(p))],
     ['late','En retard',n(p=>{const r=prochainRdv(p);return r&&etatDate(r.date)==='late';})],
     ['encours','Parcours entamé',n(p=>nbFaits(p)>0)],
@@ -1079,6 +1096,7 @@ function renderListe(){
           <div class="nm">${esc(nomComplet(p))}</div>
           <div class="mt">${coord} ${esc(p.tel||mailDe(p)||'Pas de coordonnées')}</div>
         </div>
+        ${!estArc?`<button class="star${p.qualifie==='OUI'?' on':''}" data-star="${p.id}" onclick="event.stopPropagation()" title="${p.qualifie==='OUI'?'Retirer le qualifié':'Marquer comme qualifié'}">${p.qualifie==='OUI'?'★':'☆'}</button>`:''}
       </div>
       <div class="badges">
         ${p.env?`<span class="bd ${p.env}">${p.env==='CHAUD'?'Chaud':p.env==='TIEDE'?'Tiède':'Froid'}</span>`:''}
@@ -1099,6 +1117,7 @@ function renderListe(){
 
 /* ================= fiche ================= */
 function ouvrir(id){
+  if(vue==='investisseurs'||vue==='filleuls'||vue==='archive'){ retourFiltre=filtre; retourScroll=window.scrollY; }
   fiche = data.find(p=>p.id===id);
   if(!fiche) return;
   rdvOpen=null;
@@ -1107,6 +1126,7 @@ function ouvrir(id){
   $('#fName').textContent = nomComplet(fiche);
   majSousTitre();
   majBoutonsArchive();
+  majStarFiche();
   renderRdvs(); renderNotes(); renderForm(); renderMsgSel();
   $('#fRdvEd').classList.remove('on');
   $('#fSaved').textContent='';
@@ -1120,6 +1140,11 @@ function majSousTitre(){
     fiche.tel||'', mailDe(fiche)||''
   ].filter(Boolean).join(' · ');
   $('#fSub').textContent = t;
+}
+function majStarFiche(){
+  const on = fiche.qualifie==='OUI';
+  $('#fStar').classList.toggle('on', on);
+  $('#fStar').textContent = on ? '★ Qualifié' : '☆ Qualifié';
 }
 function majBoutonsArchive(){
   const a = !!fiche.archive;
@@ -1341,6 +1366,9 @@ document.addEventListener('click', ev=>{
   const op = t.closest('[data-open]');
   if(op){ ouvrir(op.dataset.open); return; }
 
+  const et = t.closest('[data-star]');
+  if(et){ basculerQualifie(et.dataset.star); return; }
+
   const re = t.closest('[data-restore]');
   if(re){
     const p = data.find(x=>x.id===re.dataset.restore);
@@ -1417,7 +1445,18 @@ $('#aSave').onclick = ()=>{
 };
 
 /* --- fiche --- */
-$('#fBack').onclick = ()=>go(!fiche?'investisseurs':(fiche.archive?'archive':(fiche.type==='filleul'?'filleuls':'investisseurs')));
+$('#fStar').onclick = ()=>{ if(fiche) basculerQualifie(fiche.id); };
+$('#fBack').onclick = ()=>{
+  const dest = !fiche?'investisseurs':(fiche.archive?'archive':(fiche.type==='filleul'?'filleuls':'investisseurs'));
+  vue=dest;
+  typeCur = dest==='archive'?'archive':(dest==='filleuls'?'filleul':'investisseur');
+  filtre = retourFiltre;
+  $$('.view').forEach(s=>s.classList.remove('on'));
+  $('#v-liste').classList.add('on');
+  $$('.nb').forEach(b=>b.classList.toggle('on', b.dataset.go===dest));
+  renderListe();
+  window.scrollTo({top:retourScroll||0, behavior:'instant'});
+};
 $('#edClose').onclick = ()=>$('#fRdvEd').classList.remove('on');
 $('#edSave').onclick = ()=>{
   if(rdvOpen===null) return;
