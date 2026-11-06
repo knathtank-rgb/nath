@@ -1117,8 +1117,8 @@ function renderListe(){
           <div class="mt">${coord} ${esc(p.tel||mailDe(p)||'Pas de coordonnées')}</div>
         </div>
         ${!estArc?`<div class="cardacts">
-          <button class="contact${p.contacte==='OUI'?' on':''}" data-contact="${p.id}" onclick="event.stopPropagation()" title="${p.contacte==='OUI'?'Retirer « contacté »':'Marquer comme contacté'}${p.contacte==='OUI'&&p.contacteLe?' · '+fmtD(p.contacteLe):''}">${p.contacte==='OUI'?'☑':'☐'}</button>
-          <button class="star${p.qualifie==='OUI'?' on':''}" data-star="${p.id}" onclick="event.stopPropagation()" title="${p.qualifie==='OUI'?'Retirer le qualifié':'Marquer comme qualifié'}">${p.qualifie==='OUI'?'★':'☆'}</button>
+          <button class="contact${p.contacte==='OUI'?' on':''}" onclick="event.stopPropagation(); basculerContacte('${p.id}')" title="${p.contacte==='OUI'?'Retirer « contacté »':'Marquer comme contacté'}${p.contacte==='OUI'&&p.contacteLe?' · '+fmtD(p.contacteLe):''}">${p.contacte==='OUI'?'☑':'☐'}</button>
+          <button class="star${p.qualifie==='OUI'?' on':''}" onclick="event.stopPropagation(); basculerQualifie('${p.id}')" title="${p.qualifie==='OUI'?'Retirer le qualifié':'Marquer comme qualifié'}">${p.qualifie==='OUI'?'★':'☆'}</button>
         </div>`:''}
       </div>
       <div class="badges">
@@ -1396,11 +1396,6 @@ document.addEventListener('click', ev=>{
   const op = t.closest('[data-open]');
   if(op){ ouvrir(op.dataset.open); return; }
 
-  const et = t.closest('[data-star]');
-  if(et){ basculerQualifie(et.dataset.star); return; }
-
-  const ect = t.closest('[data-contact]');
-  if(ect){ basculerContacte(ect.dataset.contact); return; }
 
   const re = t.closest('[data-restore]');
   if(re){
