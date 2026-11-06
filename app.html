@@ -105,10 +105,15 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
 .pcard:hover{transform:translateY(-2px);border-color:var(--teal2);box-shadow:0 4px 8px rgba(7,38,61,.06),0 16px 36px rgba(7,38,61,.1)}
 .pcard .top{display:flex;gap:12px;align-items:center}
 .av{width:46px;height:46px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit';font-weight:600;font-size:16px}
-.star{margin-left:auto;flex:none;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--line2);padding:2px}
+.cardacts{margin-left:auto;flex:none;display:flex;align-items:center;gap:2px}
+.star{flex:none;background:none;border:none;font-size:22px;line-height:1;cursor:pointer;color:var(--line2);padding:2px}
 .star.on{color:#E0A526}
+.contact{flex:none;background:none;border:none;font-size:19px;line-height:1;cursor:pointer;color:var(--line2);padding:2px}
+.contact.on{color:var(--ok)}
 .star-fiche{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);border-radius:11px;font-size:13.5px;font-weight:600;padding:8px 14px;cursor:pointer;color:#fff;margin-right:10px}
 .star-fiche.on{background:#E0A526;border-color:#E0A526;color:#2b2206}
+.contact-fiche{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);border-radius:11px;font-size:13.5px;font-weight:600;padding:8px 14px;cursor:pointer;color:#fff;margin-right:10px}
+.contact-fiche.on{background:var(--ok);border-color:var(--ok);color:#fff}
 .av.CHAUD{background:linear-gradient(135deg,#E07B57,#C9512F)}
 .av.TIEDE{background:linear-gradient(135deg,#E0B05C,#C28A2C)}
 .av.FROID{background:linear-gradient(135deg,#2E8FB5,#13678F)}
@@ -385,6 +390,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
       </div>
       <div class="sp"></div>
       <button class="star-fiche" id="fStar">☆ Qualifié</button>
+      <button class="contact-fiche" id="fContact">☐ Contacté</button>
       <button class="back" id="fBack">‹ Retour</button>
     </div>
   </div>
@@ -886,6 +892,7 @@ function parseCSV(txt){
 function nouveau(type){
   return {id:uid(), type:type, prenom:'', nom:'', tel:'', email:'', env:'', geo:'',
     situation:'', age:'', enfants:'', proprio:'', activite:'', qualifie:'', pertinent:'',
+    contacte:'', contacteLe:'',
     rdv:[], notes:[], cree:today(), archive:false, motif:'', archDate:'', maj:new Date().toISOString()};
 }
 function seed(){
@@ -1020,6 +1027,7 @@ function filtrer(){
     }
     if(filtre==='CHAUD'||filtre==='TIEDE'||filtre==='FROID') return p.env===filtre;
     if(filtre==='qualifie') return p.qualifie==='OUI';
+    if(filtre==='contacte') return p.contacte==='OUI';
     if(filtre==='rdv') return !!prochainRdv(p);
     if(filtre==='late'){ const r=prochainRdv(p); return r && etatDate(r.date)==='late'; }
     if(filtre==='sans') return !prochainRdv(p) && nbFaits(p)===0;
@@ -1044,6 +1052,17 @@ function basculerQualifie(id){
   touch(p); save();
   if(vue==='investisseurs'||vue==='filleuls'||vue==='archive') renderListe();
   if(vue==='fiche' && fiche && fiche.id===id){ majSousTitre(); renderForm(); majStarFiche(); }
+  if(vue==='accueil') renderAccueil();
+}
+function basculerContacte(id){
+  const p = data.find(x=>x.id===id);
+  if(!p) return;
+  const on = p.contacte==='OUI';
+  p.contacte = on ? '' : 'OUI';
+  p.contacteLe = on ? '' : today();
+  touch(p); save();
+  if(vue==='investisseurs'||vue==='filleuls'||vue==='archive') renderListe();
+  if(vue==='fiche' && fiche && fiche.id===id){ majSousTitre(); renderForm(); majContactFiche(); }
   if(vue==='accueil') renderAccueil();
 }
 function renderListe(){
@@ -1073,6 +1092,7 @@ function renderListe(){
     ['TIEDE','Tièdes',n(p=>p.env==='TIEDE')],
     ['FROID','Froids',n(p=>p.env==='FROID')],
     ['qualifie','★ Qualifiés',n(p=>p.qualifie==='OUI')],
+    ['contacte','✓ Contactés',n(p=>p.contacte==='OUI')],
     ['rdv','Avec rendez-vous',n(p=>!!prochainRdv(p))],
     ['late','En retard',n(p=>{const r=prochainRdv(p);return r&&etatDate(r.date)==='late';})],
     ['encours','Parcours entamé',n(p=>nbFaits(p)>0)],
@@ -1096,7 +1116,10 @@ function renderListe(){
           <div class="nm">${esc(nomComplet(p))}</div>
           <div class="mt">${coord} ${esc(p.tel||mailDe(p)||'Pas de coordonnées')}</div>
         </div>
-        ${!estArc?`<button class="star${p.qualifie==='OUI'?' on':''}" data-star="${p.id}" onclick="event.stopPropagation()" title="${p.qualifie==='OUI'?'Retirer le qualifié':'Marquer comme qualifié'}">${p.qualifie==='OUI'?'★':'☆'}</button>`:''}
+        ${!estArc?`<div class="cardacts">
+          <button class="contact${p.contacte==='OUI'?' on':''}" data-contact="${p.id}" onclick="event.stopPropagation()" title="${p.contacte==='OUI'?'Retirer « contacté »':'Marquer comme contacté'}${p.contacte==='OUI'&&p.contacteLe?' · '+fmtD(p.contacteLe):''}">${p.contacte==='OUI'?'☑':'☐'}</button>
+          <button class="star${p.qualifie==='OUI'?' on':''}" data-star="${p.id}" onclick="event.stopPropagation()" title="${p.qualifie==='OUI'?'Retirer le qualifié':'Marquer comme qualifié'}">${p.qualifie==='OUI'?'★':'☆'}</button>
+        </div>`:''}
       </div>
       <div class="badges">
         ${p.env?`<span class="bd ${p.env}">${p.env==='CHAUD'?'Chaud':p.env==='TIEDE'?'Tiède':'Froid'}</span>`:''}
@@ -1127,6 +1150,7 @@ function ouvrir(id){
   majSousTitre();
   majBoutonsArchive();
   majStarFiche();
+  majContactFiche();
   renderRdvs(); renderNotes(); renderForm(); renderMsgSel();
   $('#fRdvEd').classList.remove('on');
   $('#fSaved').textContent='';
@@ -1145,6 +1169,11 @@ function majStarFiche(){
   const on = fiche.qualifie==='OUI';
   $('#fStar').classList.toggle('on', on);
   $('#fStar').textContent = on ? '★ Qualifié' : '☆ Qualifié';
+}
+function majContactFiche(){
+  const on = fiche.contacte==='OUI';
+  $('#fContact').classList.toggle('on', on);
+  $('#fContact').textContent = on ? ('☑ Contacté'+(fiche.contacteLe?(' · '+fmtD(fiche.contacteLe)):'')) : '☐ Contacté';
 }
 function majBoutonsArchive(){
   const a = !!fiche.archive;
@@ -1339,7 +1368,8 @@ function exportXlsx(){
       'Prénom':p.prenom,'Nom':p.nom,'Téléphone':p.tel,'E-mail':p.email,
       'Relation':p.env,'Géographie':p.geo,'Situation':p.situation,'Âge':p.age,
       'Enfants':p.enfants,'Propriétaire':p.proprio,'En activité':p.activite,
-      'Qualifié':p.qualifie,'Pertinent':p.pertinent
+      'Qualifié':p.qualifie,'Pertinent':p.pertinent,
+      'Contacté':p.contacte==='OUI'?'Oui':'Non','Contacté le':fmtD(p.contacteLe)
     };
     for(let i=0;i<NB_RDV;i++){
       const r=rdvDe(p,i);
@@ -1368,6 +1398,9 @@ document.addEventListener('click', ev=>{
 
   const et = t.closest('[data-star]');
   if(et){ basculerQualifie(et.dataset.star); return; }
+
+  const ect = t.closest('[data-contact]');
+  if(ect){ basculerContacte(ect.dataset.contact); return; }
 
   const re = t.closest('[data-restore]');
   if(re){
@@ -1446,6 +1479,7 @@ $('#aSave').onclick = ()=>{
 
 /* --- fiche --- */
 $('#fStar').onclick = ()=>{ if(fiche) basculerQualifie(fiche.id); };
+$('#fContact').onclick = ()=>{ if(fiche) basculerContacte(fiche.id); };
 $('#fBack').onclick = ()=>{
   const dest = !fiche?'investisseurs':(fiche.archive?'archive':(fiche.type==='filleul'?'filleuls':'investisseurs'));
   vue=dest;
